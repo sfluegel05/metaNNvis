@@ -1,4 +1,5 @@
 from torch.nn import Module
+from torchvision import models
 
 from frameworks.Framework import Framework
 
