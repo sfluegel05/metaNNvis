@@ -35,5 +35,7 @@ class Torch2TfTranslation(Translation):
 
         tf_rep.export_graph('models/mnist_tf.pb')
         tf_model = tf.saved_model.load('models/mnist_tf.pb')
+        # TODO: saved_model.load does not load the complete keras model, but loading it as a keras model would require
+        # saving it a different way which is not available in onnx-tf
 
         return tf_model
