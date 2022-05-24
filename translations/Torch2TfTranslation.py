@@ -19,10 +19,10 @@ class Torch2TfTranslation(Translation):
 
     @staticmethod
     def translate(model, *args, **kwargs):
-        if not isinstance(model, torch.nn.Module):
+        if not PyTorchFramework.is_framework_model(model):
             raise Exception(
                 f'A torch-model has to be an instance of torch.nn.Module. The given model is of type {type}')
-
+        # TODO: delete temporary model save files
 
         onnx_path = 'temp_torch2onnx.onnx'
         torch.onnx.export(model, kwargs['dummy_input'], onnx_path)
