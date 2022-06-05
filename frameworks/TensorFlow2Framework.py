@@ -11,3 +11,4 @@ class TensorFlow2Framework(Framework):
     @staticmethod
     def is_framework_model(model):
         return isinstance(model, tf.keras.Model)
+        # open question: which 'class' is SavedModel?

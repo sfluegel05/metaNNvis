@@ -1,10 +1,11 @@
 from translations.Torch2TfTranslation import Torch2TfTranslation
+from translations.Tf2TorchTranslation import Tf2TorchTranslation
 from frameworks.PyTorchFramework import PyTorchFramework
 from frameworks.TensorFlow2Framework import TensorFlow2Framework
 from translations.Translation import Translation
 from frameworks.Framework import Framework
 
-TRANSLATIONS = [Torch2TfTranslation]
+TRANSLATIONS = [Torch2TfTranslation, Tf2TorchTranslation]
 FRAMEWORKS = [PyTorchFramework, TensorFlow2Framework]
 
 
