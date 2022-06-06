@@ -90,3 +90,10 @@ def execute(model, method_key, toolset=None, *args, **kwargs):
     model = translate(model, method_toolset.get_framework(), *args, **kwargs)
 
     return method.execute(model, *args, **kwargs)
+
+
+if __name__ == "__main__":
+    import tensorflow as tf
+    import os
+    tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
+    print(execute(tf_model, 'integrated_gradients'))

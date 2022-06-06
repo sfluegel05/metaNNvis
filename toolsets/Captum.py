@@ -11,7 +11,7 @@ class Captum(Toolset):
 
     @staticmethod
     def get_framework():
-        PyTorchFramework.get_framework_key()
+        return PyTorchFramework.get_framework_key()
 
     @staticmethod
     def get_methods():
