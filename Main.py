@@ -11,7 +11,6 @@ FRAMEWORKS = [PyTorchFramework, TensorFlow2Framework]
 TOOLSETS = [Captum]
 
 
-# todo: account for translation to own framework
 def translate(model, to_framework, *args, **kwargs):
     input_key = ''
     for fw in FRAMEWORKS:
@@ -22,6 +21,10 @@ def translate(model, to_framework, *args, **kwargs):
     if input_key == '':
         print('Could not detect the model framework')
         return False
+
+    # base case: no translation needed
+    if input_key == to_framework:
+        return model
 
     for trans in TRANSLATIONS:
         if isinstance(trans(), Translation):

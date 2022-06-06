@@ -16,7 +16,7 @@ from frameworks.PyTorchFramework import PyTorchFramework
 
 
 class TestTranslation(unittest.TestCase):
-    # todo: add case translation to own framework
+
     def setUp(self):
         self.torch_net = TorchConvNet()
         self.torch_net.load_state_dict(torch.load('../project_preparation_demo/models/mnist_pytorch.pth'))
@@ -86,6 +86,12 @@ class TestTranslation(unittest.TestCase):
         translation = translate(self.torch_net, 'not a framework', dummy_input=next(iter(self.mnist_torch)))
 
         self.assertFalse(translation)
+
+    def test_tf_to_tf_translation(self):
+        tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
+        translation = translate(tf_model, TensorFlow2Framework.get_framework_key())
+
+        self.assertEqual(tf_model, translation)
 
 
 class TorchConvNet(nn.Module):
