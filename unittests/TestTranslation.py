@@ -16,7 +16,7 @@ from frameworks.PyTorchFramework import PyTorchFramework
 
 
 class TestTranslation(unittest.TestCase):
-
+    # todo: add case translation to own framework
     def setUp(self):
         self.torch_net = TorchConvNet()
         self.torch_net.load_state_dict(torch.load('../project_preparation_demo/models/mnist_pytorch.pth'))
@@ -62,6 +62,7 @@ class TestTranslation(unittest.TestCase):
             print(f'torch-logits: {torch_l}')
             print(f'tf-logits: {tf_l}')
             self.assertEqual(tf_o, torch_o)
+            # unlike the other translation direction, here the logits are nearly perfectly equal
 
 
     def test_tf_to_torch_mobilenet(self):
