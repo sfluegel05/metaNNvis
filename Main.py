@@ -1,3 +1,5 @@
+import torch
+
 from toolsets.Captum import Captum
 from translations.Torch2TfTranslation import Torch2TfTranslation
 from translations.Tf2TorchTranslation import Tf2TorchTranslation
@@ -45,7 +47,7 @@ def execute(model, method_key, toolset=None, *args, **kwargs):
         if len(methods) == 0:
             print(f'Could not find a method with key "{method_key}". The following methods are available: ')
             for t in TOOLSETS:
-                print(f'From toolset {t.get_toolset_key()}: {",".join([m.get_method_key() for m in t.get_methods()])}')
+                print(f'\tFrom toolset {t.get_toolset_key()}: {",".join([m.get_method_key() for m in t.get_methods()])}')
             return False
 
     else:
@@ -96,4 +98,9 @@ if __name__ == "__main__":
     import tensorflow as tf
     import os
     tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
-    print(execute(tf_model, 'integrated_gradients'))
+    print(execute(tf_model, 'integrated_gradients', input=torch.rand(1, 1, 28, 28), target=1))
+    #print(execute(tf_model, 'integrated_gradients', toolset='captum'))
+    #print(execute(tf_model, 'gradiated_integers'))
+    #print(execute(tf_model, 'integrated_gradients', toolset='tf-keras-vis'))  # todo: warning + use correct toolset
+    # todo: exceptions
+
