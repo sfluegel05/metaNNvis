@@ -10,5 +10,5 @@ class Method(ABC):
 
     @staticmethod
     @abstractmethod
-    def execute(model, *args, **kwargs):
+    def execute(model, init_args=None, exec_args=None):
         pass

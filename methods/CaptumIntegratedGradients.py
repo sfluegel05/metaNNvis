@@ -10,15 +10,17 @@ class CaptumIntegratedGradients(Method):
         return 'integrated_gradients'
 
     @staticmethod
-    def execute(model, *args, **kwargs):
+    def execute(model, init_args=None, exec_args=None):
+        if exec_args is None:
+            exec_args = {}
+        if init_args is None:
+            init_args = {}
+
         required_keys = ['input']
-        for key in required_keys:
-            if key not in kwargs:
-                raise Exception(f'Call to {CaptumIntegratedGradients.get_method_key()} requires the argument {key}')
-        ig = IntegratedGradients(model)
-        if 'target' in kwargs:
-            attribution = ig.attribute(kwargs['input'], target=kwargs['target'])
-        else:
-            attribution = ig.attribute(kwargs['input'])
+        #for key in required_keys:
+        #    if key not in kwargs:
+        #        raise Exception(f'Call to {CaptumIntegratedGradients.get_method_key()} requires the argument {key}')
+        ig = IntegratedGradients(model, **init_args)
+        attribution = ig.attribute(**exec_args)
 
         return attribution

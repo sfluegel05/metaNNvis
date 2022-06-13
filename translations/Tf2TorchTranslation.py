@@ -20,7 +20,7 @@ class Tf2TorchTranslation(Translation):
         return PyTorchFramework.get_framework_key()
 
     @staticmethod
-    def translate(model, *args, **kwargs):
+    def translate(model, **kwargs):
         # TODO: clean up console output
         tf_path = os.path.join('models', 'temp_tf')
         tf.saved_model.save(model, tf_path)

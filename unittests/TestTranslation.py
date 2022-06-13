@@ -37,6 +37,7 @@ class TestTranslation(unittest.TestCase):
 
         mnist_x, mnist_y = next(iter(self.mnist_torch))
         mynet_tf = translate(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
+        print(type(mynet_tf))
         output = mynet_tf(**{'input.1': mnist_x})
         output_argmax = np.argmax(output['20'], axis=1)
         torch_out = self.torch_net(mnist_x)
