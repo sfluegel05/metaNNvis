@@ -1,13 +1,12 @@
-from captum.attr import IntegratedGradients
+from captum.attr import DeepLift
 
 from methods.Method import Method
 
-
-class CaptumIntegratedGradients(Method):
+class CaptumDeepLift(Method):
 
     @staticmethod
     def get_method_key():
-        return 'integrated_gradients'
+        return 'deep_lift'
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):
@@ -16,8 +15,8 @@ class CaptumIntegratedGradients(Method):
         if init_args is None:
             init_args = {}
 
-        ig = IntegratedGradients(model, **init_args)
-        attribution = ig.attribute(**exec_args)
+        deep_lift = DeepLift(model, **init_args)
+        attribution = deep_lift.attribute(**exec_args)
 
         return attribution
 

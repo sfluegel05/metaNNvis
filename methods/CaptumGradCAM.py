@@ -1,13 +1,12 @@
-from captum.attr import IntegratedGradients
+from captum.attr import LayerGradCam
 
 from methods.Method import Method
 
-
-class CaptumIntegratedGradients(Method):
+class CaptumGradCAM(Method):
 
     @staticmethod
     def get_method_key():
-        return 'integrated_gradients'
+        return 'grad_cam'
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):
@@ -16,10 +15,14 @@ class CaptumIntegratedGradients(Method):
         if init_args is None:
             init_args = {}
 
-        ig = IntegratedGradients(model, **init_args)
-        attribution = ig.attribute(**exec_args)
+        grad_cam = LayerGradCam(model, **init_args)
+        attribution = grad_cam.attribute(**exec_args)
 
         return attribution
+
+    @staticmethod
+    def get_required_init_keys():
+        return ['layer']
 
     @staticmethod
     def get_required_exec_keys():
