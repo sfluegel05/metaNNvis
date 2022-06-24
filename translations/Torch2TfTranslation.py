@@ -23,7 +23,8 @@ class Torch2TfTranslation(Translation):
             raise Exception(
                 f'A torch-model has to be an instance of torch.nn.Module. The given model is of type {type}')
         # TODO: delete temporary model save files
-
+        if 'dummy_input' not in kwargs:
+            raise Exception('The translation from PyTorch to Tensorflow requires providing an argument \'dummy_input\'')
         onnx_path = 'temp_torch2onnx.onnx'
         torch.onnx.export(model, kwargs['dummy_input'], onnx_path)
 
@@ -35,7 +36,5 @@ class Torch2TfTranslation(Translation):
 
         tf_rep.export_graph('models/mnist_tf.pb')
         tf_model = tf.saved_model.load('models/mnist_tf.pb')
-        # TODO: saved_model.load does not load the complete keras model, but loading it as a keras model would require
-        # saving it a different way which is not available in onnx-tf
 
         return tf_model

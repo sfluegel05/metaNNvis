@@ -16,11 +16,17 @@ class CaptumIntegratedGradients(Method):
         if init_args is None:
             init_args = {}
 
-        required_keys = ['input']
         #for key in required_keys:
         #    if key not in kwargs:
         #        raise Exception(f'Call to {CaptumIntegratedGradients.get_method_key()} requires the argument {key}')
         ig = IntegratedGradients(model, **init_args)
         attribution = ig.attribute(**exec_args)
 
+
+
         return attribution
+
+
+    @staticmethod
+    def get_required_exec_keys():
+        return ['inputs']

@@ -75,6 +75,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
               f'{",".join([f.get_framework_key() for f in FRAMEWORKS])}')
 
     method, method_toolset = methods[0]
+    # if multiple methods match: pick one that matches the toolset if available, pick the first registered otherwise
     if len(methods) > 1:
         if toolset is None:
             logging.warning(f'Multiple methods found for key {method_key}: ')
@@ -87,6 +88,16 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
             method, method_toolset = framework_methods[0]
         logging.warning(f'Chose method {method.get_method_key() (method_toolset.get_toolset_key())}')
 
+    # check arguments
+    for key in method.get_required_init_keys():
+        if key not in init_args.keys():
+            raise Exception(f'The method {method.get_method_key()} requires that you include an argument \'{key}\' in'
+                            f' the init_args dictionary.')
+    for key in method.get_required_exec_keys():
+        if key not in exec_args.keys():
+            raise Exception(f'The method {method.get_method_key()} requires that you include an argument \'{key}\' in'
+                            f' the exec_args dictionary.')
+
     model = translate(model, method_toolset.get_framework(), **kwargs)
 
     return method.execute(model, init_args, exec_args)
@@ -95,54 +106,23 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
 if __name__ == "__main__":
     import tensorflow as tf
     import os
-    import matplotlib.pyplot as plt
     from torchvision import datasets
 
     tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
-    test_data = datasets.FashionMNIST(
+    mnist_test_data = datasets.FashionMNIST(
         root="datasets",
         train=False,
         download=True,
         transform=ToTensor()
     )
-    test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
-    test_input_tensor, test_labels = next(iter(test_dataloader))
+    mnist_test_dataloader = DataLoader(mnist_test_data, batch_size=64, shuffle=True)
+    test_input_tensor, test_labels = next(iter(mnist_test_dataloader))
     test_input_tensor.requires_grad_()
 
-    labels_map = {
-        0: "T-Shirt",
-        1: "Trouser",
-        2: "Pullover",
-        3: "Dress",
-        4: "Coat",
-        5: "Sandal",
-        6: "Shirt",
-        7: "Sneaker",
-        8: "Bag",
-        9: "Ankle Boot",
-    }
+    mnist_test_dataloader = DataLoader(mnist_test_data, batch_size=64, shuffle=True)
+    execute(tf_model, 'integrated_gradients', init_args={'multiply_by_inputs': False},
+            exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
 
-    n_rows = 5
-    for i in range(n_rows):
-        label = test_labels[i].item()
-        print(label)
-        attr = execute(tf_model, 'integrated_gradients', init_args={'multiply_by_inputs': False},
-                       exec_args={'inputs': test_input_tensor, 'target': label})
-        attr = attr.detach().numpy()
-
-        img = test_input_tensor[i][0].detach()
-        figure = plt.figure(figsize=(20, 20))
-        figure.add_subplot(n_rows, 2, i * 2 + 1)
-        plt.title(f'Label: {labels_map[label]}')
-        plt.axis("off")
-        plt.imshow(img, cmap="gray")
-        figure.add_subplot(n_rows, 2, i * 2 + 2)
-        plt.title(f'Integrated Gradients')
-        plt.axis("off")
-        plt.imshow(attr[0][0], cmap="gray")
-        #plt.savefig(f"integrated_gradients_fashion_mnist_demo_{i}.png")
-
-    plt.show()
 
     #print(execute(tf_model, 'integrated_gradients', toolset='captum'))
     #print(execute(tf_model, 'gradiated_integers'))
