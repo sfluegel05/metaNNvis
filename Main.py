@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
+import logging
 
 from toolsets.Captum import Captum
 from translations.Torch2TfTranslation import Torch2TfTranslation
@@ -23,8 +24,7 @@ def translate(model, to_framework, **kwargs):
                 input_key = fw.get_framework_key()
 
     if input_key == '':
-        print('Could not detect the model framework')
-        return False
+        raise Exception('Could not detect the model framework')
 
     # base case: no translation needed
     if input_key == to_framework:
@@ -35,9 +35,7 @@ def translate(model, to_framework, **kwargs):
             if input_key == trans.get_input() and to_framework == trans.get_output():
                 return trans.translate(model, **kwargs)
 
-    print(f'Could not find a translation from {input_key} to {to_framework}')
-    return False
-
+    raise Exception(f'Could not find a translation from {input_key} to {to_framework}')
 
 def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
     methods = []
@@ -47,10 +45,10 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
                 if m.get_method_key() == method_key:
                     methods.append((m, t))
         if len(methods) == 0:
-            print(f'Could not find a method with key "{method_key}". The following methods are available: ')
+            ex_str = f'Could not find a method with key "{method_key}". The following methods are available: '
             for t in TOOLSETS:
-                print(f'\tFrom toolset {t.get_toolset_key()}: {",".join([m.get_method_key() for m in t.get_methods()])}')
-            return False
+                ex_str += f'\n\tFrom toolset {t.get_toolset_key()}: {",".join([m.get_method_key() for m in t.get_methods()])}'
+            raise Exception(ex_str)
 
     else:
         for t in TOOLSETS:
@@ -59,12 +57,11 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
                     if m.get_method_key() == method_key:
                         methods.append((m, t))
                 if len(methods) == 0:
-                    print(f'Could not find a method with key "{method_key}" in toolset {toolset}.', end=' ')
-                    print(f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods()])}')
-                    return False
+                    raise Exception(f'Could not find a method with key "{method_key}" in toolset {toolset}.'
+                      + f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods()])}')
 
         if len(methods) == 0:
-            print(f'Could not find the toolset "{toolset}". Available toolsets are:'
+            raise Exception(f'Could not find the toolset "{toolset}". Available toolsets are:'
                   f' {",".join([t.get_toolset_key() for t in TOOLSETS])}')
 
     model_framework = ''
@@ -74,22 +71,21 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
                 model_framework = fw.get_framework_key()
 
     if model_framework == '':
-        print(f'Could not detect the model framework. Available frameworks are: '
+        raise Exception(f'Could not detect the model framework. Available frameworks are: '
               f'{",".join([f.get_framework_key() for f in FRAMEWORKS])}')
-        return False
 
     method, method_toolset = methods[0]
     if len(methods) > 1:
         if toolset is None:
-            print(f'Multiple methods found for key {method_key}: ', end='')
+            logging.warning(f'Multiple methods found for key {method_key}: ')
         else:
-            print(f'Multiple methods found for key {method_key} in toolset {toolset}: ', end='')
-        print(f'{",".join([f"{m.get_method_key()} ({t.get_toolset_key()})" for m, t in methods])}')
+            logging.warning(f'Multiple methods found for key {method_key} in toolset {toolset}: ')
+        logging.warning(f'{",".join([f"{m.get_method_key()} ({t.get_toolset_key()})" for m, t in methods])}')
 
         framework_methods = list(filter(lambda x: x[1].get_framework() == model_framework, methods))
         if len(framework_methods) > 0:
             method, method_toolset = framework_methods[0]
-        print(f'Chose method {method.get_method_key() (method_toolset.get_toolset_key())}')
+        logging.warning(f'Chose method {method.get_method_key() (method_toolset.get_toolset_key())}')
 
     model = translate(model, method_toolset.get_framework(), **kwargs)
 
