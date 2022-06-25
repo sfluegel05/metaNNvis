@@ -1,14 +1,14 @@
-from captum.attr import IntegratedGradients, LayerIntegratedGradients
+from captum.attr import LayerIntegratedGradients
 
 from methods.Method import Method
-from methods.method_keys import INTEGRATED_GRADIENTS
+from methods.method_keys import LAYER_INTEGRATED_GRADIENTS
 
 
-class CaptumIntegratedGradients(Method):
+class CaptumLayerIntegratedGradients(Method):
 
     @staticmethod
     def get_method_key():
-        return INTEGRATED_GRADIENTS
+        return LAYER_INTEGRATED_GRADIENTS
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):
@@ -17,14 +17,14 @@ class CaptumIntegratedGradients(Method):
         if init_args is None:
             init_args = {}
 
-        if 'layer' in init_args:
-            print(model.Conv_0)
-            ig = LayerIntegratedGradients(model, layer=model.Conv_0)
-        else:
-            ig = IntegratedGradients(model, **init_args)
+        ig = LayerIntegratedGradients(model, **init_args)
         attribution = ig.attribute(**exec_args)
 
         return attribution
+
+    @staticmethod
+    def get_required_init_keys():
+        return ['layer']
 
     @staticmethod
     def get_required_exec_keys():

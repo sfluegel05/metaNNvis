@@ -1,4 +1,5 @@
 from frameworks.PyTorchFramework import PyTorchFramework
+from methods.CaptumLayerIntegratedGradients import CaptumLayerIntegratedGradients
 from methods.CaptumDeepLift import CaptumDeepLift
 from methods.CaptumFeatureAblation import CaptumFeatureAblation
 from methods.CaptumFeaturePermutation import CaptumFeaturePermutation
@@ -23,4 +24,4 @@ class Captum(Toolset):
     @staticmethod
     def get_methods():
         return [CaptumIntegratedGradients, CaptumDeepLift, CaptumFeatureAblation, CaptumFeaturePermutation,
-                CaptumGradCAM, CaptumInputXGradient, CaptumSaliency]
+                CaptumGradCAM, CaptumInputXGradient, CaptumSaliency, CaptumLayerIntegratedGradients]

@@ -5,7 +5,12 @@ class Translation(ABC):
 
     @staticmethod
     @abstractmethod
-    def translate(model, **kwargs):
+    def translate_model(model, **kwargs):
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def translate_data(data, **kwargs):
         pass
 
     @staticmethod

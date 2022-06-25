@@ -9,7 +9,7 @@ import torchvision
 import tensorflow as tf
 import tensorflow_hub as hub
 
-from Main import translate
+from Main import translate_model
 from torch.utils.data import DataLoader
 from frameworks.TensorFlow2Framework import TensorFlow2Framework
 from frameworks.PyTorchFramework import PyTorchFramework
@@ -35,7 +35,7 @@ class TestTranslation(unittest.TestCase):
         # self.assertTrue(TensorFlow2Framework.is_framework_model(alexnet_tf))
 
         mnist_x, mnist_y = next(iter(self.mnist_torch))
-        mynet_tf = translate(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
+        mynet_tf = translate_model(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
 
         tf_logits_full = mynet_tf(**{'input.1': mnist_x})
         tf_logits = tf_logits_full['20']
@@ -54,7 +54,7 @@ class TestTranslation(unittest.TestCase):
 
     def test_tf_to_torch_basic_cnn(self):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
-        torch_model = translate(tf_model, PyTorchFramework.get_framework_key())
+        torch_model = translate_model(tf_model, PyTorchFramework.get_framework_key())
 
         mnist_x, mnist_y = next(iter(self.mnist_torch))
         torch_logits = torch_model(mnist_x)
@@ -73,7 +73,7 @@ class TestTranslation(unittest.TestCase):
             hub.KerasLayer("https://tfhub.dev/google/imagenet/mobilenet_v1_100_128/classification/5")
         ])
         model.build([None, 128, 128, 3])
-        mobilenet_torch = translate(model, PyTorchFramework.get_framework_key())
+        mobilenet_torch = translate_model(model, PyTorchFramework.get_framework_key())
         print(type(mobilenet_torch))
         # ! translation fails, because onnx2torch is not supporting asymmetric padding
 
@@ -82,18 +82,18 @@ class TestTranslation(unittest.TestCase):
         """If the provided model format does not match one of the frameworks, the translation should fail"""
 
         with self.assertRaises(Exception):
-            translate('not a model', TensorFlow2Framework.get_framework_key())
+            translate_model('not a model', TensorFlow2Framework.get_framework_key())
 
 
     def test_wrong_framework(self):
         """If the translation output framework does not exist, the translation should fail"""
         with self.assertRaises(Exception):
-            translate(self.torch_net, 'not a framework', dummy_input=next(iter(self.mnist_torch)))
+            translate_model(self.torch_net, 'not a framework', dummy_input=next(iter(self.mnist_torch)))
 
 
     def test_tf_to_tf_translation(self):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
-        translation = translate(tf_model, TensorFlow2Framework.get_framework_key())
+        translation = translate_model(tf_model, TensorFlow2Framework.get_framework_key())
 
         self.assertEqual(tf_model, translation)
 

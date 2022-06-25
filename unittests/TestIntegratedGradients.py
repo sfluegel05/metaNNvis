@@ -11,6 +11,7 @@ import toolsets.toolset_keys
 from methods import method_keys
 
 from Main import execute
+from translations.Tf2TorchTranslation import Tf2TorchTranslation
 
 
 class TestIntegratedGradients(unittest.TestCase):
@@ -38,15 +39,15 @@ class TestIntegratedGradients(unittest.TestCase):
         }
 
     # integrated gradients with regard to input
-    def test__primary_integrated_gradients(self):
+    def test_primary_integrated_gradients(self):
         test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
         test_input_tensor.requires_grad_()
 
         n_rows = 1
         for i in range(n_rows):
             label = test_labels[i].item()
-            print(label)
-            attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, init_args={'multiply_by_inputs': False},
+            layer = self.tf_model.get_layer('conv2d_1')
+            attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, init_args={'layer': self.tf_model},
                            exec_args={'inputs': test_input_tensor, 'target': label})
             attr = attr.detach().numpy()
 

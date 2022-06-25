@@ -20,7 +20,7 @@ class Tf2TorchTranslation(Translation):
         return PyTorchFramework.get_framework_key()
 
     @staticmethod
-    def translate(model, **kwargs):
+    def translate_model(model, **kwargs):
         # TODO: clean up console output
         tf_path = os.path.join('models', 'temp_tf')
         tf.saved_model.save(model, tf_path)
@@ -31,11 +31,19 @@ class Tf2TorchTranslation(Translation):
 
         return torch_model
 
+    @staticmethod
+    def translate_data(data, **kwargs):
+        # translate lists recursively
+        if isinstance(data, list):
+            return list(map(lambda x: Tf2TorchTranslation.translate_data(x), data))
+        else:
+            return data
+
 
 if __name__ == '__main__':
     model = tf.saved_model.load(os.path.join('..', 'project_preparation_demo', 'models', 'mnist_tf_pretrained'))
     print(model)
-    torch_model = Tf2TorchTranslation.translate(model)
+    torch_model = Tf2TorchTranslation.translate_model(model)
     print(torch_model)
     input = torch.randn([1, 1, 28, 28])
     print(torch_model(input))

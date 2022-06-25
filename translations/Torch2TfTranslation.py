@@ -18,7 +18,7 @@ class Torch2TfTranslation(Translation):
         return TensorFlow2Framework.get_framework_key()
 
     @staticmethod
-    def translate(model, **kwargs):
+    def translate_model(model, **kwargs):
         if not PyTorchFramework.is_framework_model(model):
             raise Exception(
                 f'A torch-model has to be an instance of torch.nn.Module. The given model is of type {type}')
@@ -38,3 +38,8 @@ class Torch2TfTranslation(Translation):
         tf_model = tf.saved_model.load('models/mnist_tf.pb')
 
         return tf_model
+
+    @staticmethod
+    def translate_data(data, **kwargs):
+        # TODO: implement
+        return data
