@@ -8,11 +8,9 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
-import toolsets.toolset_keys
 from methods import method_keys
 
 from Main import execute, finish_execution_with_layer
-from translations.Tf2TorchTranslation import Tf2TorchTranslation
 
 
 class TestIntegratedGradients(unittest.TestCase):
@@ -47,8 +45,7 @@ class TestIntegratedGradients(unittest.TestCase):
         n_rows = 1
         for i in range(n_rows):
             label = test_labels[i].item()
-            layer = self.tf_model.get_layer('conv2d_1')
-            attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, init_args={'layer': self.tf_model},
+            attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS,
                            exec_args={'inputs': test_input_tensor, 'target': label})
             attr = attr.detach().numpy()
 
@@ -85,8 +82,8 @@ class TestIntegratedGradients(unittest.TestCase):
         test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
         test_input_tensor.requires_grad_()
         res = execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
-                        init_args={'multiply_by_inputs': False, 'layer': 'Conv_1'},
-                        exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+                      init_args={'multiply_by_inputs': False, 'layer': 'Conv_1'},
+                      exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
 
         self.assertTrue(isinstance(res, torch.Tensor))
         self.assertEquals(res.size()[1], 20)
@@ -99,6 +96,18 @@ class TestIntegratedGradients(unittest.TestCase):
             test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
             test_input_tensor.requires_grad_()
             execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
-                        init_args={'multiply_by_inputs': False, 'layer': 'not a layer'},
-                        exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+                    init_args={'multiply_by_inputs': False, 'layer': 'not a layer'},
+                    exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
 
+    # neuron integrated gradients: verify output for neuron in second conv layer
+    def test_neuron_integrated_gradients(self):
+        test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
+        test_input_tensor.requires_grad_()
+        res = execute(self.tf_model, method_keys.NEURON_INTEGRATED_GRADIENTS,
+                      init_args={'multiply_by_inputs': False, 'layer': 'Conv_1'},
+                      exec_args={'inputs': test_input_tensor, 'neuron_selector': (3, 3, 3)})
+
+        self.assertTrue(isinstance(res, torch.Tensor))
+        self.assertEquals(res.size()[1], 1)
+        self.assertEquals(res.size()[2], 28)
+        self.assertEquals(res.size()[3], 28)
