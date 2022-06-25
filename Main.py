@@ -1,11 +1,10 @@
-import torch
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 import logging
 
 import methods.method_keys
-from toolsets import toolset_keys
 from toolsets.Captum import Captum
+from toolsets.TfKerasVis import TfKerasVis
 from translations.Torch2TfTranslation import Torch2TfTranslation
 from translations.Tf2TorchTranslation import Tf2TorchTranslation
 from frameworks.PyTorchFramework import PyTorchFramework
@@ -15,7 +14,7 @@ from frameworks.Framework import Framework
 
 TRANSLATIONS = [Torch2TfTranslation, Tf2TorchTranslation]
 FRAMEWORKS = [PyTorchFramework, TensorFlow2Framework]
-TOOLSETS = [Captum]
+TOOLSETS = [Captum, TfKerasVis]
 
 
 def detect_model_framework(model):
