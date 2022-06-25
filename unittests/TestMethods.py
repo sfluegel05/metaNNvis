@@ -2,10 +2,12 @@ import unittest
 
 import tensorflow as tf
 import os
-import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+
+import toolsets.toolset_keys
+from methods import method_keys
 
 from Main import execute
 
@@ -35,35 +37,33 @@ class TestMethods(unittest.TestCase):
             9: "Ankle Boot",
         }
 
+    def test_nonexistent_method(self):
+        with self.assertRaises(Exception):
+            execute(self.tf_model, 'not a method')
+
+    # don't throw an exception, but execute method from correct toolset after displaying a warning
+    def test_wrong_toolset(self):
+        # TODO
+        pass
+
+    def test_nonexistent_toolset(self):
+        with self.assertRaises(Exception):
+            execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, 'not a toolset')
+
+    def test_multiple_methods_available(self):
+        # TODO
+        pass
+
+    def test_missing_init_args(self):
+        test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
+        with self.assertRaises(Exception):
+            # gradCAM requires an init argument 'layer'
+            execute(self.tf_model, method_keys.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
+                    exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+
     def test_missing_exec_args(self):
         test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
         with self.assertRaises(Exception):
             # inputs is missing
-            execute(self.tf_model, 'integrated_gradients', init_args={'multiply_by_inputs': False},
+            execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, init_args={'multiply_by_inputs': False},
                            exec_args={'target': test_labels[0].item()})
-
-    def test_integrated_gradients(self):
-        test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
-        test_input_tensor.requires_grad_()
-
-        n_rows = 1
-        for i in range(n_rows):
-            label = test_labels[i].item()
-            print(label)
-            attr = execute(self.tf_model, 'integrated_gradients', init_args={'multiply_by_inputs': False},
-                           exec_args={'inputs': test_input_tensor, 'target': label})
-            attr = attr.detach().numpy()
-
-            img = test_input_tensor[i][0].detach()
-            figure = plt.figure(figsize=(20, 20))
-            figure.add_subplot(n_rows, 2, i * 2 + 1)
-            plt.title(f'Label: {self.labels_map[label]}')
-            plt.axis("off")
-            plt.imshow(img, cmap="gray")
-            figure.add_subplot(n_rows, 2, i * 2 + 2)
-            plt.title(f'Integrated Gradients')
-            plt.axis("off")
-            plt.imshow(attr[0][0], cmap="gray")
-            # plt.savefig(f"integrated_gradients_fashion_mnist_demo_{i}.png")
-
-        plt.show()
