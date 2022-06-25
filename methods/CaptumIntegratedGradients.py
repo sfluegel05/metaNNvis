@@ -1,13 +1,14 @@
 from captum.attr import IntegratedGradients
 
 from methods.Method import Method
+from methods.method_keys import INTEGRATED_GRADIENTS
 
 
 class CaptumIntegratedGradients(Method):
 
     @staticmethod
     def get_method_key():
-        return 'integrated_gradients'
+        return INTEGRATED_GRADIENTS
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

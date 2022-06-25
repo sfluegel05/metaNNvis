@@ -1,12 +1,14 @@
 from captum.attr import DeepLift
 
 from methods.Method import Method
+from methods.method_keys import DEEP_LIFT
+
 
 class CaptumDeepLift(Method):
 
     @staticmethod
     def get_method_key():
-        return 'deep_lift'
+        return DEEP_LIFT
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

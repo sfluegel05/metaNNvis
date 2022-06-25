@@ -1,12 +1,14 @@
 from captum.attr import LayerGradCam
 
 from methods.Method import Method
+from methods.method_keys import GRAD_CAM
+
 
 class CaptumGradCAM(Method):
 
     @staticmethod
     def get_method_key():
-        return 'grad_cam'
+        return GRAD_CAM
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

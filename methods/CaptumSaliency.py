@@ -1,12 +1,14 @@
 from captum.attr import Saliency
 
 from methods.Method import Method
+from methods.method_keys import SALIENCY
+
 
 class CaptumSaliency(Method):
 
     @staticmethod
     def get_method_key():
-        return 'saliency'
+        return SALIENCY
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

@@ -1,13 +1,14 @@
 from captum.attr import FeatureAblation
 
 from methods.Method import Method
+from methods.method_keys import FEATURE_ABLATION
 
 
 class CaptumFeatureAblation(Method):
 
     @staticmethod
     def get_method_key():
-        return 'feature_ablation'
+        return FEATURE_ABLATION
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

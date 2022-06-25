@@ -1,12 +1,14 @@
 from captum.attr import FeaturePermutation
 
 from methods.Method import Method
+from methods.method_keys import FEATURE_PERMUTATION
+
 
 class CaptumFeaturePermutation(Method):
 
     @staticmethod
     def get_method_key():
-        return 'feature_permutation'
+        return FEATURE_PERMUTATION
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):

@@ -1,0 +1,7 @@
+DEEP_LIFT = 'deep_lift'
+FEATURE_ABLATION = 'feature_ablation'
+FEATURE_PERMUTATION = 'feature_permutation'
+GRAD_CAM = 'grad_cam'
+INPUT_X_GRADIENT = 'input_x_gradient'
+INTEGRATED_GRADIENTS = 'integrated_gradients'
+SALIENCY = 'saliency'

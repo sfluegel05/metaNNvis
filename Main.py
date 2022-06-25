@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 import logging
 
+import toolsets.toolset_keys
 from toolsets.Captum import Captum
 from translations.Torch2TfTranslation import Torch2TfTranslation
 from translations.Tf2TorchTranslation import Tf2TorchTranslation
@@ -119,6 +120,7 @@ if __name__ == "__main__":
     test_input_tensor, test_labels = next(iter(mnist_test_dataloader))
     test_input_tensor.requires_grad_()
 
+    method = CAPTUM
     mnist_test_dataloader = DataLoader(mnist_test_data, batch_size=64, shuffle=True)
     execute(tf_model, 'integrated_gradients', init_args={'multiply_by_inputs': False},
             exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})

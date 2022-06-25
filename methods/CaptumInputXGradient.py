@@ -1,12 +1,14 @@
 from captum.attr import InputXGradient
 
 from methods.Method import Method
+from methods.method_keys import INPUT_X_GRADIENT
+
 
 class CaptumInputXGradient(Method):
 
     @staticmethod
     def get_method_key():
-        return 'input_x_gradient'
+        return INPUT_X_GRADIENT
 
     @staticmethod
     def execute(model, init_args=None, exec_args=None):
