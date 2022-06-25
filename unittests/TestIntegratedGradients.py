@@ -3,6 +3,7 @@ import unittest
 import tensorflow as tf
 import os
 import matplotlib.pyplot as plt
+import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
@@ -10,7 +11,7 @@ from torchvision.transforms import ToTensor
 import toolsets.toolset_keys
 from methods import method_keys
 
-from Main import execute
+from Main import execute, finish_execution_with_layer
 from translations.Tf2TorchTranslation import Tf2TorchTranslation
 
 
@@ -64,3 +65,40 @@ class TestIntegratedGradients(unittest.TestCase):
             # plt.savefig(f"integrated_gradients_fashion_mnist_demo_{i}.png")
 
         plt.show()
+
+    # layer integrated gradients: verify output for second conv layer (layer only provided after intermediate step)
+    def test_layer_integrated_gradients_intermediate(self):
+        test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
+        test_input_tensor.requires_grad_()
+        inter = execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
+                        init_args={'multiply_by_inputs': False},
+                        exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+        res = finish_execution_with_layer(inter, 'Conv_1')
+
+        self.assertTrue(isinstance(res, torch.Tensor))
+        self.assertEquals(res.size()[1], 20)
+        self.assertEquals(res.size()[2], 8)
+        self.assertEquals(res.size()[3], 8)
+
+    # layer integrated gradients: verify output for second conv layer (layer provided directly)
+    def test_layer_integrated_gradients_direct(self):
+        test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
+        test_input_tensor.requires_grad_()
+        res = execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
+                        init_args={'multiply_by_inputs': False, 'layer': 'Conv_1'},
+                        exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+
+        self.assertTrue(isinstance(res, torch.Tensor))
+        self.assertEquals(res.size()[1], 20)
+        self.assertEquals(res.size()[2], 8)
+        self.assertEquals(res.size()[3], 8)
+
+    # nonexistent layer provided -> exception
+    def test_layer_integrated_gradients_wrong_layer(self):
+        with self.assertRaises(Exception):
+            test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
+            test_input_tensor.requires_grad_()
+            execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
+                        init_args={'multiply_by_inputs': False, 'layer': 'not a layer'},
+                        exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+

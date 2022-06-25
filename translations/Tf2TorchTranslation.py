@@ -36,6 +36,12 @@ class Tf2TorchTranslation(Translation):
         # translate lists recursively
         if isinstance(data, list):
             return list(map(lambda x: Tf2TorchTranslation.translate_data(x), data))
+        elif isinstance(data, str) and 'model' in kwargs and 'key' in kwargs and kwargs['key'] == 'layer':
+            if data not in [elem for elem in dict(kwargs['model'].named_children()).keys()]:
+                raise Exception(f'The value provided for the argument \'layer\' (\'{data}\') does not reference a '
+                                f'layer in the translated model. Valid options are: '
+                                f'{[elem for elem in dict(kwargs["model"].named_children()).keys()]}')
+            return getattr(kwargs['model'], data)
         else:
             return data
 

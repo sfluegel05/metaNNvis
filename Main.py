@@ -55,7 +55,7 @@ def translate_data(data_dict, to_framework, original_model, translated_model):
                 if isinstance(data_dict, dict):
                     return_dict = {}
                     for key, value in data_dict.items():
-                        return_dict[key] = trans.translate_data(value, model=translated_model)
+                        return_dict[key] = trans.translate_data(value, model=translated_model, key=key)
                     return return_dict
                 else:
                     return trans.translate_data(data_dict, model=translated_model)
@@ -130,7 +130,8 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
     # special case: if the method requires a 'layer' argument, the layer has to be a layer from the target framework
     # model. Since this can be neither specified by the user beforehand nor determined automatically, ask the user at
     # this point to select a layer
-    if "layer" in method.get_required_init_keys() and method_toolset.get_framework() == PyTorchFramework.get_framework_key():
+    if "layer" in method.get_required_init_keys() and "layer" not in init_args\
+            and method_toolset.get_framework() == PyTorchFramework.get_framework_key():
         logging.warning(f'The method you want to call requires you to provide a PyTorch model layer. Please call '
                         f'\'finish_execution_with_layer(intermediate_output, layer_key)\' with the return value of this'
                         f' call as \'intermediate_output\' and one of '
