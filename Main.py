@@ -78,6 +78,22 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
             method_type=AbstractAttributionMethod.get_method_type(), **kwargs):
     method_key = method_key.lower()
     methods = []
+    if toolset is not None:
+        if toolset not in TOOLSETS:
+            logging.warning(f'Could not find the toolset "{toolset}". Available toolsets are:'
+                            f' {",".join([t.get_toolset_key() for t in TOOLSETS])}')
+        else:
+            for t in TOOLSETS:
+                if t.get_toolset_key() == toolset:
+                    for m in t.get_methods(method_type):
+                        if m.get_method_key() == method_key:
+                            methods.append((m, t))
+                    if len(methods) == 0:
+                        logging.warning(f'Could not find a method with key "{method_key}" in toolset {toolset}.'
+                                        + f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods(method_type)])}')
+        if len(methods) == 0:
+            logging.info(f'Looking for method "{method_key}" in all toolsets')
+            toolset = None
     if toolset is None:
         for t in TOOLSETS:
             for m in t.get_methods(method_type):
@@ -89,20 +105,6 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
                 ex_str += f'\n\tFrom toolset {t.get_toolset_key()}: ' \
                           f'{",".join([m.get_method_key() for m in t.get_methods(method_type)])}'
             raise Exception(ex_str)
-
-    else:
-        for t in TOOLSETS:
-            if t.get_toolset_key() == toolset:
-                for m in t.get_methods(method_type):
-                    if m.get_method_key() == method_key:
-                        methods.append((m, t))
-                if len(methods) == 0:
-                    raise Exception(f'Could not find a method with key "{method_key}" in toolset {toolset}.'
-                                    + f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods(method_type)])}')
-
-        if len(methods) == 0:
-            raise Exception(f'Could not find the toolset "{toolset}". Available toolsets are:'
-                            f' {",".join([t.get_toolset_key() for t in TOOLSETS])}')
 
     model_framework = ''
     for fw in FRAMEWORKS:
@@ -173,4 +175,4 @@ if __name__ == "__main__":
 
     # print(execute(tf_model, 'integrated_gradients', toolset='captum'))
     # print(execute(tf_model, 'gradiated_integers'))
-    # print(execute(tf_model, 'integrated_gradients', toolset='tf-keras-vis'))  # todo: warning + use correct toolset
+    # print(execute(tf_model, 'integrated_gradients', toolset='tf-keras-vis')) # should put out a warning and use the correct toolset
