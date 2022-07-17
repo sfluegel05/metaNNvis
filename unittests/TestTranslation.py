@@ -1,3 +1,4 @@
+import logging
 import os.path
 import unittest
 
@@ -33,24 +34,24 @@ class TestTranslation(unittest.TestCase):
         # alexnet_tf = translate(self.alexNet, TensorFlow2Framework.get_framework_key(),
         #                       dummy_input=dummy)
         # self.assertTrue(TensorFlow2Framework.is_framework_model(alexnet_tf))
-
         mnist_x, mnist_y = next(iter(self.mnist_torch))
         mynet_tf = translate_model(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
-
-        tf_logits_full = mynet_tf(**{'input.1': mnist_x})
-        tf_logits = tf_logits_full['20']
+        # TODO: fix input
+        print(mynet_tf.summary())
+        tf_logits = mynet_tf(mnist_x.numpy().reshape((mnist_x.size(dim=0), mnist_x.size(dim=2), mnist_x.size(dim=3), mnist_x.size(dim=1))))
+        #tf_logits_full = mynet_tf(**{'input.1': mnist_x})
+        #tf_logits = tf_logits_full['20']
         tf_output = np.argmax(tf_logits, axis=1)
-        torch_logits_full = self.torch_net(mnist_x)
-        torch_logits = torch_logits_full
+        torch_logits = self.torch_net(mnist_x)
         torch_output = torch.argmax(torch_logits, dim=1)
         for torch_l, tf_l in zip(np.array(torch_logits.detach().numpy()).flatten(), np.array(tf_logits.numpy()).flatten()):
             self.assertAlmostEqual(torch_l, tf_l, 3)
 
-        for torch_l, torch_o, tf_l, tf_o, y in zip(torch_logits, torch_output, tf_logits, tf_output,
-                                                                  mnist_y.tolist()):
-            print(f'torch-output: {torch_o}, tf-output: {tf_o}, label: {y}')
-            print(f'torch-logits: {np.array(torch_l.detach().numpy())}')
-            print(f'tf-logits: {tf_l}')
+        #for torch_l, torch_o, tf_l, tf_o, y in zip(torch_logits, torch_output, tf_logits, tf_output,
+        #                                                          mnist_y.tolist()):
+        #    print(f'torch-output: {torch_o}, tf-output: {tf_o}, label: {y}')
+        #    print(f'torch-logits: {np.array(torch_l.detach().numpy())}')
+        #    print(f'tf-logits: {tf_l}')
 
     def test_tf_to_torch_basic_cnn(self):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))

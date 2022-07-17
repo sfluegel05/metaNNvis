@@ -1,3 +1,5 @@
+import os.path
+
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 import logging
@@ -151,24 +153,10 @@ def finish_execution_with_layer(intermediate_output, layer_key):
 
 if __name__ == "__main__":
     import tensorflow as tf
-    import os
-    from torchvision import datasets
 
-    tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
-    mnist_test_data = datasets.FashionMNIST(
-        root="datasets",
-        train=False,
-        download=True,
-        transform=ToTensor()
-    )
-    mnist_test_dataloader = DataLoader(mnist_test_data, batch_size=64, shuffle=True)
-    test_input_tensor, test_labels = next(iter(mnist_test_dataloader))
-    test_input_tensor.requires_grad_()
-
-    mnist_test_dataloader = DataLoader(mnist_test_data, batch_size=64, shuffle=True)
-    inter = execute(tf_model, methods.method_keys.LAYER_INTEGRATED_GRADIENTS, init_args={'multiply_by_inputs': False},
-            exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
-    print(finish_execution_with_layer(inter, 'Conv_1').size())
+    new_model = tf.keras.models.load_model(os.path.join('translations', 'models', 'mnist_tf.pb'))
+    print(type(new_model))
+    print(new_model)
 
     # print(execute(tf_model, 'integrated_gradients', toolset='captum'))
     # print(execute(tf_model, 'gradiated_integers'))
