@@ -1,10 +1,10 @@
 from captum.attr import LayerDeepLift
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import LAYER_DEEP_LIFT
 
 
-class CaptumLayerDeepLift(Method):
+class CaptumLayerDeepLift(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

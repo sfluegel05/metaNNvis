@@ -1,10 +1,10 @@
 from captum.attr import IntegratedGradients, LayerIntegratedGradients
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import INTEGRATED_GRADIENTS
 
 
-class CaptumIntegratedGradients(Method):
+class CaptumIntegratedGradients(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

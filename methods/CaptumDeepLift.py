@@ -1,10 +1,10 @@
 from captum.attr import DeepLift
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import DEEP_LIFT
 
 
-class CaptumDeepLift(Method):
+class CaptumDeepLift(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

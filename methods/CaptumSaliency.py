@@ -1,10 +1,10 @@
 from captum.attr import Saliency
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import SALIENCY
 
 
-class CaptumSaliency(Method):
+class CaptumSaliency(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

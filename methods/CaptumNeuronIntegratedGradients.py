@@ -1,10 +1,10 @@
 from captum.attr import NeuronIntegratedGradients
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import NEURON_INTEGRATED_GRADIENTS
 
 
-class CaptumNeuronIntegratedGradients(Method):
+class CaptumNeuronIntegratedGradients(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

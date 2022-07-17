@@ -1,10 +1,9 @@
 import os.path
 
-from torch.utils.data import DataLoader
-from torchvision.transforms import ToTensor
 import logging
 
-import methods.method_keys
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
+from methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
 from toolsets.Captum import Captum
 from toolsets.TfKerasVis import TfKerasVis
 from translations.Torch2TfTranslation import Torch2TfTranslation
@@ -29,6 +28,7 @@ def detect_model_framework(model):
 
 
 def translate_model(model, to_framework, **kwargs):
+    to_framework = to_framework.lower()
     input_key = detect_model_framework(model)
 
     # base case: no translation needed
@@ -64,28 +64,41 @@ def translate_data(data_dict, to_framework, original_model, translated_model):
     raise Exception(f'Could not find a translation from {input_key} to {to_framework}')
 
 
-def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
+def perform_attribution(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
+    return execute(model, method_key, toolset, init_args, exec_args,
+                   method_type=AbstractAttributionMethod.get_method_type(), **kwargs)
+
+
+def perform_feature_visualization(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
+    return execute(model, method_key, toolset, init_args, exec_args,
+                   method_type=AbstractFeatureVisualizationMethod.get_method_type(), **kwargs)
+
+
+def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
+            method_type=AbstractAttributionMethod.get_method_type(), **kwargs):
+    method_key = method_key.lower()
     methods = []
     if toolset is None:
         for t in TOOLSETS:
-            for m in t.get_methods():
+            for m in t.get_methods(method_type):
                 if m.get_method_key() == method_key:
                     methods.append((m, t))
         if len(methods) == 0:
             ex_str = f'Could not find a method with key "{method_key}". The following methods are available: '
             for t in TOOLSETS:
-                ex_str += f'\n\tFrom toolset {t.get_toolset_key()}: {",".join([m.get_method_key() for m in t.get_methods()])}'
+                ex_str += f'\n\tFrom toolset {t.get_toolset_key()}: ' \
+                          f'{",".join([m.get_method_key() for m in t.get_methods(method_type)])}'
             raise Exception(ex_str)
 
     else:
         for t in TOOLSETS:
             if t.get_toolset_key() == toolset:
-                for m in t.get_methods():
+                for m in t.get_methods(method_type):
                     if m.get_method_key() == method_key:
                         methods.append((m, t))
                 if len(methods) == 0:
                     raise Exception(f'Could not find a method with key "{method_key}" in toolset {toolset}.'
-                                    + f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods()])}')
+                                    + f'Available methods are: {",".join([m.get_method_key() for m in t.get_methods(method_type)])}')
 
         if len(methods) == 0:
             raise Exception(f'Could not find the toolset "{toolset}". Available toolsets are:'
@@ -131,7 +144,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, **k
     # special case: if the method requires a 'layer' argument, the layer has to be a layer from the target framework
     # model. Since this can be neither specified by the user beforehand nor determined automatically, ask the user at
     # this point to select a layer
-    if "layer" in method.get_required_init_keys() and "layer" not in init_args\
+    if "layer" in method.get_required_init_keys() and "layer" not in init_args \
             and method_toolset.get_framework() == PyTorchFramework.get_framework_key():
         logging.warning(f'The method you want to call requires you to provide a PyTorch model layer. Please call '
                         f'\'finish_execution_with_layer(intermediate_output, layer_key)\' with the return value of this'

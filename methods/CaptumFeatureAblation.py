@@ -1,10 +1,10 @@
 from captum.attr import FeatureAblation
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import FEATURE_ABLATION
 
 
-class CaptumFeatureAblation(Method):
+class CaptumFeatureAblation(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

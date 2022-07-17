@@ -1,10 +1,10 @@
 from captum.attr import LayerFeatureAblation
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import LAYER_FEATURE_ABLATION
 
 
-class CaptumLayerFeatureAblation(Method):
+class CaptumLayerFeatureAblation(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

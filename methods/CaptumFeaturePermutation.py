@@ -1,10 +1,10 @@
 from captum.attr import FeaturePermutation
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import FEATURE_PERMUTATION
 
 
-class CaptumFeaturePermutation(Method):
+class CaptumFeaturePermutation(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

@@ -1,10 +1,10 @@
 from tf_keras_vis.saliency import Saliency
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import SALIENCY
 
 
-class TfKerasVisSaliency(Method):
+class TfKerasVisSaliency(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

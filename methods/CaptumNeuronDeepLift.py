@@ -1,10 +1,10 @@
 from captum.attr import NeuronDeepLift
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import NEURON_DEEP_LIFT
 
 
-class CaptumNeuronDeepLift(Method):
+class CaptumNeuronDeepLift(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

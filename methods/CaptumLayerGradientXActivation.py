@@ -1,10 +1,10 @@
 from captum.attr import LayerGradientXActivation
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import LAYER_GRADIENT_X_ACTIVATION
 
 
-class CaptumLayerGradientXActivation(Method):
+class CaptumLayerGradientXActivation(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

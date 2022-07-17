@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Method(ABC):
+class AbstractMethod(ABC):
 
     @staticmethod
     @abstractmethod
@@ -20,3 +20,9 @@ class Method(ABC):
     @staticmethod
     def get_required_exec_keys():
         return []
+
+    # distinguish between attribution and feature visualization methods (and possibly other categories)
+    @staticmethod
+    @abstractmethod
+    def get_method_type():
+        pass

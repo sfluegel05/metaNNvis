@@ -28,11 +28,12 @@ class Captum(Toolset):
         return PyTorchFramework.get_framework_key()
 
     @staticmethod
-    def get_methods():
-        return [CaptumIntegratedGradients, CaptumLayerIntegratedGradients, CaptumNeuronIntegratedGradients,
-                CaptumSaliency,
-                CaptumDeepLift, CaptumLayerDeepLift, CaptumNeuronDeepLift,
-                CaptumInputXGradient, CaptumLayerGradientXActivation,
-                CaptumFeatureAblation, CaptumLayerFeatureAblation, CaptumNeuronFeatureAblation,
-                CaptumFeaturePermutation,
-                CaptumGradCAM]
+    def get_methods(method_type):
+        return filter(lambda x: x.get_method_type == method_type,
+                      [CaptumIntegratedGradients, CaptumLayerIntegratedGradients, CaptumNeuronIntegratedGradients,
+                       CaptumSaliency,
+                       CaptumDeepLift, CaptumLayerDeepLift, CaptumNeuronDeepLift,
+                       CaptumInputXGradient, CaptumLayerGradientXActivation,
+                       CaptumFeatureAblation, CaptumLayerFeatureAblation, CaptumNeuronFeatureAblation,
+                       CaptumFeaturePermutation,
+                       CaptumGradCAM])

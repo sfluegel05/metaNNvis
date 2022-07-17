@@ -15,5 +15,5 @@ class TfKerasVis(Toolset):
         return PyTorchFramework.get_framework_key()
 
     @staticmethod
-    def get_methods():
-        return [TfKerasVisSaliency]
+    def get_methods(method_type):
+        return filter(lambda x: x.get_method_type == method_type, [TfKerasVisSaliency])

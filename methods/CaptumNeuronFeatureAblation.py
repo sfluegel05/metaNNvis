@@ -1,10 +1,10 @@
 from captum.attr import NeuronFeatureAblation
 
-from methods.Method import Method
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import NEURON_FEATURE_ABLATION
 
 
-class CaptumNeuronFeatureAblation(Method):
+class CaptumNeuronFeatureAblation(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

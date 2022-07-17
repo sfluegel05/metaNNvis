@@ -15,5 +15,5 @@ class Toolset(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_methods():
+    def get_methods(method_type):
         pass
