@@ -8,7 +8,7 @@ import onnx
 from onnx_tf.backend import prepare
 import tensorflow as tf
 
-from onnx2keras import main
+from onnx2keras import main, onnx2keras
 
 
 class Torch2TfTranslation(Translation):
@@ -33,18 +33,19 @@ class Torch2TfTranslation(Translation):
         torch.onnx.export(model, kwargs['dummy_input'], onnx_path)
 
         # Load the ONNX file
-        #onnx_model = onnx.load(onnx_path)
+        onnx_model = onnx.load(onnx_path)
 
         # Import the ONNX model to Tensorflow
-        #tf_rep = prepare(onnx_model, logging_level='WARNING')
-        #print(tf_rep._tf_module)
-        #tf_rep.export_graph(os.path.join('..', 'models', 'mnist_tf.pb'))
-        #tf_model1 = tf.saved_model.load(os.path.join('..', 'models', 'mnist_tf.pb'))
+        # tf_rep = prepare(onnx_model, logging_level='WARNING')
+        # print(tf_rep._tf_module)
+        # tf_rep.export_graph(os.path.join('..', 'models', 'mnist_tf.pb'))
+        # tf_model1 = tf.saved_model.load(os.path.join('..', 'models', 'mnist_tf.pb'))
 
-        main(onnx_path, os.path.join('..', 'models', 'mnist_keras.h5'))
-        tf_model2 = tf.keras.models.load_model(os.path.join('..', 'models', 'mnist_keras.h5'))
+        # main(onnx_path, os.path.join('..', 'models', 'mnist_keras.h5'))
+        # tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'mnist_keras.h5'))
 
-        return tf_model2
+        tf_model = onnx2keras(onnx_model)
+        return tf_model
 
     @staticmethod
     def translate_data(data, **kwargs):

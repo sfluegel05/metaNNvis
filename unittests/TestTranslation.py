@@ -47,14 +47,32 @@ class TestTranslation(unittest.TestCase):
         tf_output = np.argmax(tf_logits, axis=1)
         torch_logits = self.torch_net(mnist_x)
         torch_output = torch.argmax(torch_logits, dim=1)
-        for torch_l, tf_l in zip(np.array(torch_logits.detach().numpy()).flatten(), np.array(tf_logits.numpy()).flatten()):
+        for torch_l, tf_l in zip(np.array(torch_logits.detach().numpy()).flatten(),
+                                 np.array(tf_logits.numpy()).flatten()):
             self.assertAlmostEqual(torch_l, tf_l, 3)
 
-        #for torch_l, torch_o, tf_l, tf_o, y in zip(torch_logits, torch_output, tf_logits, tf_output,
+        # for torch_l, torch_o, tf_l, tf_o, y in zip(torch_logits, torch_output, tf_logits, tf_output,
         #                                                          mnist_y.tolist()):
         #    print(f'torch-output: {torch_o}, tf-output: {tf_o}, label: {y}')
         #    print(f'torch-logits: {np.array(torch_l.detach().numpy())}')
         #    print(f'tf-logits: {tf_l}')
+
+    def test_torch_to_tf_feed_forward_net(self):
+        data, labels = load_titanic_data()
+        data_torch = torch.from_numpy(data).type(torch.FloatTensor)
+        labels_torch = torch.from_numpy(labels)
+        ffn = TitanicSimpleNNModel()
+        ffn.load_state_dict(torch.load(os.path.join('..', 'models', 'titanic_model.pt')))
+        ffn_tf = translate_model(ffn, TensorFlow2Framework.get_framework_key(), dummy_input=data_torch)
+        print(ffn_tf.summary())
+        print(labels.tolist())
+        ffn_output = ffn(data_torch)
+        ffn_tf_output = ffn_tf(data)
+        print(ffn_output)
+        print(ffn_tf_output)
+        for torch_l, tf_l in zip(np.array(ffn_output.detach().numpy()).flatten(),
+                                 np.array(ffn_tf_output.numpy()).flatten()):
+            self.assertAlmostEqual(torch_l, tf_l, 3)
 
     def test_tf_to_torch_basic_cnn(self):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
@@ -150,3 +168,41 @@ class NoDropoutNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
+
+
+# model taken from https://captum.ai/tutorials/Titanic_Basic_Interpret
+class TitanicSimpleNNModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear1 = nn.Linear(12, 12)
+        self.sigmoid1 = nn.Sigmoid()
+        self.linear2 = nn.Linear(12, 8)
+        self.sigmoid2 = nn.Sigmoid()
+        self.linear3 = nn.Linear(8, 2)
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        lin1_out = self.linear1(x)
+        sigmoid_out1 = self.sigmoid1(lin1_out)
+        sigmoid_out2 = self.sigmoid2(self.linear2(sigmoid_out1))
+        return self.softmax(self.linear3(sigmoid_out2))
+
+
+def load_titanic_data():
+    import pandas as pd
+    titanic_data = pd.read_csv(os.path.join('..', 'data', 'titanic3.csv'))
+    titanic_data = pd.concat([titanic_data,
+                              pd.get_dummies(titanic_data['sex']),
+                              pd.get_dummies(titanic_data['embarked'], prefix="embark"),
+                              pd.get_dummies(titanic_data['pclass'], prefix="class")], axis=1)
+    titanic_data["age"] = titanic_data["age"].fillna(titanic_data["age"].mean())
+    titanic_data["fare"] = titanic_data["fare"].fillna(titanic_data["fare"].mean())
+    titanic_data = titanic_data.drop(
+        ['name', 'ticket', 'cabin', 'boat', 'body', 'home.dest', 'sex', 'embarked', 'pclass'], axis=1)
+    # Convert features and labels to numpy arrays.
+    labels = titanic_data["survived"].to_numpy()
+    titanic_data = titanic_data.drop(['survived'], axis=1)
+    feature_names = list(titanic_data.columns)
+    data = titanic_data.to_numpy()
+
+    return data, labels
