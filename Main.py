@@ -79,7 +79,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
     method_key = method_key.lower()
     methods = []
     if toolset is not None:
-        if toolset not in TOOLSETS:
+        if toolset not in [t.get_toolset_key() for t in TOOLSETS]:
             logging.warning(f'Could not find the toolset "{toolset}". Available toolsets are:'
                             f' {",".join([t.get_toolset_key() for t in TOOLSETS])}')
         else:
@@ -169,9 +169,10 @@ def finish_execution_with_layer(intermediate_output, layer_key):
 if __name__ == "__main__":
     import tensorflow as tf
 
-    new_model = tf.keras.models.load_model(os.path.join('translations', 'models', 'mnist_tf.pb'))
-    print(type(new_model))
-    print(new_model)
+    tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
+    print(type(tf_model))
+    print(tf_model.summary())
+    print(tf_model.outputs)
 
     # print(execute(tf_model, 'integrated_gradients', toolset='captum'))
     # print(execute(tf_model, 'gradiated_integers'))

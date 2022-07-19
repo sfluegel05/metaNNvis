@@ -2,6 +2,7 @@ import logging
 import os.path
 import unittest
 
+import keras.utils.vis_utils
 import numpy as np
 import torch
 import torch.nn as nn
@@ -36,11 +37,13 @@ class TestTranslation(unittest.TestCase):
         # self.assertTrue(TensorFlow2Framework.is_framework_model(alexnet_tf))
         mnist_x, mnist_y = next(iter(self.mnist_torch))
         mynet_tf = translate_model(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
-        # TODO: fix input
         print(mynet_tf.summary())
-        tf_logits = mynet_tf(mnist_x.numpy().reshape((mnist_x.size(dim=0), mnist_x.size(dim=2), mnist_x.size(dim=3), mnist_x.size(dim=1))))
-        #tf_logits_full = mynet_tf(**{'input.1': mnist_x})
-        #tf_logits = tf_logits_full['20']
+        keras.utils.vis_utils.plot_model(mynet_tf, 'test_translation_2tf.png', show_shapes=True)
+        print(type(mynet_tf))
+        print(mynet_tf.outputs)
+
+        tf_logits = mynet_tf(mnist_x.numpy().reshape((mnist_x.size(dim=0), mnist_x.size(dim=2), mnist_x.size(dim=3),
+                                                      mnist_x.size(dim=1))))
         tf_output = np.argmax(tf_logits, axis=1)
         torch_logits = self.torch_net(mnist_x)
         torch_output = torch.argmax(torch_logits, dim=1)

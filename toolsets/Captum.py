@@ -29,7 +29,7 @@ class Captum(Toolset):
 
     @staticmethod
     def get_methods(method_type):
-        return filter(lambda x: x.get_method_type == method_type,
+        return filter(lambda x: x.get_method_type() == method_type,
                       [CaptumIntegratedGradients, CaptumLayerIntegratedGradients, CaptumNeuronIntegratedGradients,
                        CaptumSaliency,
                        CaptumDeepLift, CaptumLayerDeepLift, CaptumNeuronDeepLift,
