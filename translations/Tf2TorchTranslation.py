@@ -43,9 +43,18 @@ class Tf2TorchTranslation(Translation):
                                 f'layer in the translated model. Valid options are: '
                                 f'{[elem for elem in dict(kwargs["model"].named_children()).keys()]}')
             return getattr(kwargs['model'], data)
+        # convert torch to torch array
         elif isinstance(data, tf.Tensor):
-            return torch.from_numpy(data.numpy())
+            if np.issubdtype(data.dtype, np.double):
+                data = data.astype(np.single)
+            elif np.issubdtype(data.dtype, np.integer):
+                data = data.astype(np.int_)
+            return torch.from_numpy(data)
         elif isinstance(data, np.ndarray):
+            if np.issubdtype(data.dtype, np.double):
+                data = data.astype(np.single)
+            elif np.issubdtype(data.dtype, np.integer):
+                data = data.astype(np.int64)
             return torch.from_numpy(data)
         else:
             return data

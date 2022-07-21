@@ -1,3 +1,4 @@
+import math
 import os.path
 
 import logging
@@ -64,17 +65,18 @@ def translate_data(data_dict, to_framework, original_model, translated_model):
     raise Exception(f'Could not find a translation from {input_key} to {to_framework}')
 
 
-def perform_attribution(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
-    return execute(model, method_key, toolset, init_args, exec_args,
+def perform_attribution(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False, **kwargs):
+    return execute(model, method_key, toolset, init_args, exec_args, plot,
                    method_type=AbstractAttributionMethod.get_method_type(), **kwargs)
 
 
-def perform_feature_visualization(model, method_key, toolset=None, init_args=None, exec_args=None, **kwargs):
-    return execute(model, method_key, toolset, init_args, exec_args,
+def perform_feature_visualization(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False,
+                                  **kwargs):
+    return execute(model, method_key, toolset, init_args, exec_args, plot,
                    method_type=AbstractFeatureVisualizationMethod.get_method_type(), **kwargs)
 
 
-def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
+def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False,
             method_type=AbstractAttributionMethod.get_method_type(), **kwargs):
     method_key = method_key.lower()
     methods = []
@@ -156,7 +158,14 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None,
         return {'method': method, 'translated_model': translated_model, 'translated_init_args': translated_init_args,
                 'translated_exec_args': translated_exec_args}
 
-    return method.execute(translated_model, translated_init_args, translated_exec_args)
+    res = method.execute(translated_model, translated_init_args, translated_exec_args)
+
+    if plot:
+        plot_results(res)
+
+    res = translate_data(res, detect_model_framework(model), translated_model, model)
+
+    return res
 
 
 def finish_execution_with_layer(intermediate_output, layer_key):
@@ -164,6 +173,34 @@ def finish_execution_with_layer(intermediate_output, layer_key):
     init_args = intermediate_output['translated_init_args']
     init_args['layer'] = getattr(model, layer_key)
     return intermediate_output['method'].execute(model, init_args, intermediate_output['translated_exec_args'])
+
+
+def plot_results(attr):
+    import matplotlib.pyplot as plt
+    import datetime
+    import numpy as np
+
+    if not isinstance(attr, np.ndarray):
+        attr = attr.detach().numpy()
+    n_rows = attr.shape[0]
+    if len(attr.shape) == 4 and attr.shape[1] == attr.shape[2]:
+        attr = np.reshape(attr, (n_rows, attr.shape[3], attr.shape[1], attr.shape[2]))
+    for i in range(n_rows):
+        if len(attr.shape) == 4:
+            figure = plt.figure(figsize=(10, 10))
+            fig_size = math.ceil(math.sqrt(attr.shape[1]))
+            for c in range(attr.shape[1]):
+                figure.add_subplot(fig_size, fig_size, c + 1)
+                plt.title(f'Channel {c}')
+                plt.imshow(attr[i][c], cmap="gray")
+            plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}_{i}.png")
+            plt.show()
+        else:
+            figure = plt.figure(figsize=(10, 10))
+            figure.add_subplot(1, 1, 1)
+            plt.imshow(attr[i], cmap="gray")
+            plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}_{i}.png")
+            plt.show()
 
 
 if __name__ == "__main__":

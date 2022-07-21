@@ -24,7 +24,7 @@ class TestSaliency(unittest.TestCase):
         torch_net.load_state_dict(
             torch.load('../project_preparation_demo/models/mnist_pytorch_24_06_22_no_dropout.pth'))
 
-        res = perform_attribution(torch_net, SALIENCY, toolset_keys.TF_KERAS_VIS, dummy_input=self.mnist_x,
+        res = perform_attribution(torch_net, SALIENCY, toolset_keys.TF_KERAS_VIS, dummy_input=self.mnist_x, plot=True,
                                   exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
                                              'seed_input': self.mnist_x})
 

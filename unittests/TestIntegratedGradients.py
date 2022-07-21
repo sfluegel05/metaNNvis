@@ -48,26 +48,9 @@ class TestIntegratedGradients(unittest.TestCase):
         # Rescale the images from [0,255] to the [0.0,1.0] range.
         x_train = x_train[..., np.newaxis] / 255.0
 
-        n_rows = 1
-        for i in range(n_rows):
-            label = test_labels[i].item()
-            attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS,
-                           exec_args={'inputs': x_train, 'target': y_train})
-            attr = attr.detach().numpy()
+        attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, plot=True,
+                       exec_args={'inputs': x_train[:8], 'target': y_train[:8]})
 
-            img = test_input_tensor[i][0].detach()
-            figure = plt.figure(figsize=(20, 20))
-            figure.add_subplot(n_rows, 2, i * 2 + 1)
-            plt.title(f'Label: {self.labels_map[label]}')
-            plt.axis("off")
-            plt.imshow(img, cmap="gray")
-            figure.add_subplot(n_rows, 2, i * 2 + 2)
-            plt.title(f'Integrated Gradients')
-            plt.axis("off")
-            plt.imshow(attr[0][0], cmap="gray")
-            # plt.savefig(f"integrated_gradients_fashion_mnist_demo_{i}.png")
-
-        plt.show()
 
     # layer integrated gradients: verify output for second conv layer (layer only provided after intermediate step)
     def test_layer_integrated_gradients_intermediate(self):
@@ -87,9 +70,9 @@ class TestIntegratedGradients(unittest.TestCase):
     def test_layer_integrated_gradients_direct(self):
         test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
         test_input_tensor.requires_grad_()
-        res = execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS,
+        res = execute(self.tf_model, method_keys.LAYER_INTEGRATED_GRADIENTS, plot=True,
                       init_args={'multiply_by_inputs': False, 'layer': 'Conv_1'},
-                      exec_args={'inputs': test_input_tensor, 'target': test_labels[0].item()})
+                      exec_args={'inputs': test_input_tensor[0].unsqueeze(0), 'target': test_labels[0].item()})
 
         self.assertTrue(isinstance(res, torch.Tensor))
         self.assertEquals(res.size()[1], 20)
