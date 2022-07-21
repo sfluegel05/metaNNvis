@@ -37,10 +37,7 @@ class TestTranslation(unittest.TestCase):
         # self.assertTrue(TensorFlow2Framework.is_framework_model(alexnet_tf))
         mnist_x, mnist_y = next(iter(self.mnist_torch))
         mynet_tf = translate_model(self.torch_net, TensorFlow2Framework.get_framework_key(), dummy_input=mnist_x)
-        print(mynet_tf.summary())
         keras.utils.vis_utils.plot_model(mynet_tf, 'test_translation_2tf.png', show_shapes=True)
-        print(type(mynet_tf))
-        print(mynet_tf.outputs)
 
         tf_logits = mynet_tf(mnist_x.numpy().reshape((mnist_x.size(dim=0), mnist_x.size(dim=2), mnist_x.size(dim=3),
                                                       mnist_x.size(dim=1))))
@@ -78,8 +75,11 @@ class TestTranslation(unittest.TestCase):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
         torch_model = translate_model(tf_model, PyTorchFramework.get_framework_key())
 
+        (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+        x_train = x_train[..., np.newaxis] / 255.0
+
         mnist_x, mnist_y = next(iter(self.mnist_torch))
-        torch_logits = torch_model(mnist_x)
+        torch_logits = torch_model(torch.from_numpy(x_train).float())
         torch_out = torch.argmax(torch_logits, dim=1)
         tf_logits = tf_model(mnist_x.numpy().reshape(64, 28, 28, 1))
         tf_out = np.argmax(tf_logits, axis=1)
@@ -88,7 +88,6 @@ class TestTranslation(unittest.TestCase):
             print(f'torch-logits: {torch_l}')
             print(f'tf-logits: {tf_l}')
             self.assertEqual(tf_o, torch_o)
-            # unlike the other translation direction, here the logits are nearly perfectly equal
 
     def test_tf_to_torch_mobilenet(self):
         model = tf.keras.Sequential([

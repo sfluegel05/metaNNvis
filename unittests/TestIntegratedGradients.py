@@ -4,6 +4,7 @@ import tensorflow as tf
 import os
 import matplotlib.pyplot as plt
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
@@ -42,11 +43,16 @@ class TestIntegratedGradients(unittest.TestCase):
         test_input_tensor, test_labels = next(iter(self.mnist_test_dataloader))
         test_input_tensor.requires_grad_()
 
+        (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+
+        # Rescale the images from [0,255] to the [0.0,1.0] range.
+        x_train = x_train[..., np.newaxis] / 255.0
+
         n_rows = 1
         for i in range(n_rows):
             label = test_labels[i].item()
             attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS,
-                           exec_args={'inputs': test_input_tensor, 'target': label})
+                           exec_args={'inputs': x_train, 'target': y_train})
             attr = attr.detach().numpy()
 
             img = test_input_tensor[i][0].detach()

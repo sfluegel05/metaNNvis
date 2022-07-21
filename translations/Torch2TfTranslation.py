@@ -49,5 +49,8 @@ class Torch2TfTranslation(Translation):
 
     @staticmethod
     def translate_data(data, **kwargs):
-        # TODO: implement
+        if isinstance(data, list):
+            return list(map(lambda x: Torch2TfTranslation.translate_data(x), data))
+        elif isinstance(data, torch.Tensor):
+            return data.numpy().reshape(kwargs['model'].inputs[0].shape)
         return data

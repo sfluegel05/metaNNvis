@@ -1,6 +1,7 @@
 import os
 
 import torch
+import numpy as np
 
 from frameworks.PyTorchFramework import PyTorchFramework
 from frameworks.TensorFlow2Framework import TensorFlow2Framework
@@ -42,6 +43,10 @@ class Tf2TorchTranslation(Translation):
                                 f'layer in the translated model. Valid options are: '
                                 f'{[elem for elem in dict(kwargs["model"].named_children()).keys()]}')
             return getattr(kwargs['model'], data)
+        elif isinstance(data, tf.Tensor):
+            return torch.from_numpy(data.numpy())
+        elif isinstance(data, np.ndarray):
+            return torch.from_numpy(data)
         else:
             return data
 
