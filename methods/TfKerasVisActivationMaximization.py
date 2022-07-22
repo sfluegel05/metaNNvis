@@ -1,10 +1,10 @@
 from tf_keras_vis.activation_maximization import ActivationMaximization
 
-from methods.AbstractAttributionMethod import AbstractAttributionMethod
+from methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
 from methods.method_keys import ACTIVATION_MAXIMIZATION
 
 
-class TfKerasVisActivationMaximization(AbstractAttributionMethod):
+class TfKerasVisActivationMaximization(AbstractFeatureVisualizationMethod):
     @staticmethod
     def get_method_key():
         return ACTIVATION_MAXIMIZATION

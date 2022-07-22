@@ -2,6 +2,8 @@ import unittest
 
 import tensorflow as tf
 import os
+
+from tf_keras_vis.utils.scores import CategoricalScore
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
@@ -9,7 +11,9 @@ from torchvision.transforms import ToTensor
 import toolsets.toolset_keys
 from methods import method_keys
 
-from Main import execute
+from Main import execute, perform_attribution
+from methods.method_keys import ACTIVATION_MAXIMIZATION
+from toolsets import toolset_keys
 
 
 class TestMethods(unittest.TestCase):
@@ -66,4 +70,13 @@ class TestMethods(unittest.TestCase):
         with self.assertRaises(Exception):
             # inputs is missing
             execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, init_args={'multiply_by_inputs': False},
-                           exec_args={'target': test_labels[0].item()})
+                    exec_args={'target': test_labels[0].item()})
+
+    def test_method_types(self):
+        self.mnist_x, self.mnist_y = next(iter(self.mnist_test_dataloader))
+        # perform attribution with a feature-vis method (should fail because no attribution method with that key exists)
+        with self.assertRaises(Exception):
+            perform_attribution('placeholder model', ACTIVATION_MAXIMIZATION, toolset_keys.TF_KERAS_VIS,
+                                dummy_input=self.mnist_x, plot=True,
+                                exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
+                                           'seed_input': self.mnist_x})

@@ -5,7 +5,7 @@ import torchvision
 from tf_keras_vis.utils.scores import CategoricalScore
 from torch.utils.data import DataLoader
 
-from Main import perform_attribution
+from Main import perform_attribution, perform_feature_visualization
 from methods.method_keys import SALIENCY, GRAD_CAM, ACTIVATION_MAXIMIZATION
 from toolsets import toolset_keys
 from unittests.TestTranslation import NoDropoutNet
@@ -35,8 +35,8 @@ class TestSaliency(unittest.TestCase):
         print(res)
 
     def test_tf_keras_vis_activation_maximization(self):
-        res = perform_attribution(self.torch_net, ACTIVATION_MAXIMIZATION, toolset_keys.TF_KERAS_VIS,
-                                  dummy_input=self.mnist_x, plot=True,
-                                  exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
-                                             'seed_input': self.mnist_x})
+        res = perform_feature_visualization(self.torch_net, ACTIVATION_MAXIMIZATION, toolset_keys.TF_KERAS_VIS,
+                                            dummy_input=self.mnist_x, plot=True,
+                                            exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
+                                                       'seed_input': self.mnist_x})
         print(res)
