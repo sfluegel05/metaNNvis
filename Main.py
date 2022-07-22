@@ -134,7 +134,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
         framework_methods = list(filter(lambda x: x[1].get_framework() == model_framework, methods))
         if len(framework_methods) > 0:
             method, method_toolset = framework_methods[0]
-        logging.warning(f'Chose method {method.get_method_key()(method_toolset.get_toolset_key())}')
+        logging.warning(f'Chose method {method.get_method_key()}({method_toolset.get_toolset_key()})')
 
     # check arguments
     for key in method.get_required_init_keys():
@@ -209,11 +209,27 @@ def plot_results(attr):
 
 if __name__ == "__main__":
     import tensorflow as tf
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-    tf_model = tf.keras.models.load_model(os.path.join('models', 'tf_basic_cnn_mnist'))
-    print(type(tf_model))
-    print(tf_model.summary())
-    print(tf_model.outputs)
+    (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+
+    # Rescale the images from [0,255] to the [0.0,1.0] range.
+    x_train = x_train[..., np.newaxis] / 255.0
+
+    for i in range(y_train.size):
+        x_train[i, :5, :5] = y_train[i] / 10
+
+    figure = plt.figure(figsize=(10, 10))
+    figure.add_subplot(2, 2, 1)
+    plt.imshow(x_train[4], cmap="gray")
+    figure.add_subplot(2, 2, 2)
+    plt.imshow(x_train[5], cmap="gray")
+    figure.add_subplot(2, 2, 3)
+    plt.imshow(x_train[6], cmap="gray")
+    figure.add_subplot(2, 2, 4)
+    plt.imshow(x_train[7], cmap="gray")
+    plt.show()
 
     # print(execute(tf_model, 'integrated_gradients', toolset='captum'))
     # print(execute(tf_model, 'gradiated_integers'))

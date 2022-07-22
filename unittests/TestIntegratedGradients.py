@@ -48,6 +48,11 @@ class TestIntegratedGradients(unittest.TestCase):
         # Rescale the images from [0,255] to the [0.0,1.0] range.
         x_train = x_train[..., np.newaxis] / 255.0
 
+        figure = plt.figure(figsize=(10, 10))
+        figure.add_subplot(1, 1, 1)
+        plt.imshow(x_train[0], cmap="gray")
+        plt.show()
+
         attr = execute(self.tf_model, method_keys.INTEGRATED_GRADIENTS, plot=True,
                        exec_args={'inputs': x_train[:8], 'target': y_train[:8]})
 

@@ -1,14 +1,10 @@
-import os
-
 from frameworks.PyTorchFramework import PyTorchFramework
 from frameworks.TensorFlow2Framework import TensorFlow2Framework
 from translations.Translation import Translation
 import torch
 import onnx
-from onnx_tf.backend import prepare
-import tensorflow as tf
 
-from onnx2keras import main, onnx2keras
+from onnx2keras import onnx2keras
 
 
 class Torch2TfTranslation(Translation):
@@ -29,20 +25,15 @@ class Torch2TfTranslation(Translation):
         # TODO: delete temporary model save files
         if 'dummy_input' not in kwargs:
             raise Exception('The translation from PyTorch to Tensorflow requires providing an argument \'dummy_input\'')
+
+        # deactivate dropout
+        model.eval()
+
         onnx_path = 'temp_torch2onnx.onnx'
         torch.onnx.export(model, kwargs['dummy_input'], onnx_path)
 
         # Load the ONNX file
         onnx_model = onnx.load(onnx_path)
-
-        # Import the ONNX model to Tensorflow
-        # tf_rep = prepare(onnx_model, logging_level='WARNING')
-        # print(tf_rep._tf_module)
-        # tf_rep.export_graph(os.path.join('..', 'models', 'mnist_tf.pb'))
-        # tf_model1 = tf.saved_model.load(os.path.join('..', 'models', 'mnist_tf.pb'))
-
-        # main(onnx_path, os.path.join('..', 'models', 'mnist_keras.h5'))
-        # tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'mnist_keras.h5'))
 
         tf_model = onnx2keras(onnx_model)
         return tf_model
@@ -52,5 +43,7 @@ class Torch2TfTranslation(Translation):
         if isinstance(data, list):
             return list(map(lambda x: Torch2TfTranslation.translate_data(x), data))
         elif isinstance(data, torch.Tensor):
-            return data.numpy().reshape(kwargs['model'].inputs[0].shape)
+            shape = kwargs['model'].inputs[0].shape.as_list()
+            shape = [-1 if val is None else val for val in shape]
+            return data.detach().numpy().reshape(shape)
         return data
