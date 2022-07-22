@@ -19,3 +19,4 @@ FEATURE_PERMUTATION = 'feature_permutation'
 
 GRAD_CAM = 'grad_cam'
 
+ACTIVATION_MAXIMIZATION = 'activation_maximization'

@@ -78,6 +78,10 @@ def perform_feature_visualization(model, method_key, toolset=None, init_args=Non
 
 def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False,
             method_type=AbstractAttributionMethod.get_method_type(), **kwargs):
+    if init_args is None:
+        init_args = {}
+    if exec_args is None:
+        exec_args = {}
     method_key = method_key.lower()
     methods = []
     if toolset is not None:
