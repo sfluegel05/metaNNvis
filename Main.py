@@ -186,25 +186,31 @@ def plot_results(attr):
 
     if not isinstance(attr, np.ndarray):
         attr = attr.detach().numpy()
-    n_rows = attr.shape[0]
+
+    print(attr.shape)
+    n_cols = attr.shape[0]
     if len(attr.shape) == 4 and attr.shape[1] == attr.shape[2]:
-        attr = np.reshape(attr, (n_rows, attr.shape[3], attr.shape[1], attr.shape[2]))
-    for i in range(n_rows):
+        attr = np.reshape(attr, (n_cols, attr.shape[3], attr.shape[1], attr.shape[2]))
+    if len(attr.shape) == 4:
+        figure = plt.figure(figsize=(5 * n_cols, 5 * attr.shape[1]))
+    else:
+        figure = plt.figure(figsize=(5 * n_cols, 5))
+    print(attr.shape)
+
+    counter = 0
+    for i in range(n_cols):
         if len(attr.shape) == 4:
-            figure = plt.figure(figsize=(10, 10))
-            fig_size = math.ceil(math.sqrt(attr.shape[1]))
             for c in range(attr.shape[1]):
-                figure.add_subplot(fig_size, fig_size, c + 1)
+                figure.add_subplot(attr.shape[1], n_cols, counter + 1)
+                counter += 1
                 plt.title(f'Channel {c}')
                 plt.imshow(attr[i][c], cmap="gray")
-            plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}_{i}.png")
-            plt.show()
         else:
-            figure = plt.figure(figsize=(10, 10))
-            figure.add_subplot(1, 1, 1)
+            figure.add_subplot(1, n_cols, counter + 1)
+            counter += 1
             plt.imshow(attr[i], cmap="gray")
-            plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}_{i}.png")
-            plt.show()
+    plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png")
+    plt.show()
 
 
 if __name__ == "__main__":

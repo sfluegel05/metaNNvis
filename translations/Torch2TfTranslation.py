@@ -43,7 +43,14 @@ class Torch2TfTranslation(Translation):
         if isinstance(data, list):
             return list(map(lambda x: Torch2TfTranslation.translate_data(x), data))
         elif isinstance(data, torch.Tensor):
-            shape = kwargs['model'].inputs[0].shape.as_list()
-            shape = [-1 if val is None else val for val in shape]
-            return data.detach().numpy().reshape(shape)
+            data = data.detach().numpy()
+            # move channel dimension to the last position for 2d images
+            if len(data.shape) == 4:
+                return data.reshape((data.shape[0], data.shape[2], data.shape[3], data.shape[1]))
+            else:
+                # assume the tensor is an input tensor and reshape
+                shape = kwargs['model'].inputs[0].shape.as_list()
+                shape = [-1 if val is None else val for val in shape]
+                return data.detach().numpy().reshape(shape)
+
         return data

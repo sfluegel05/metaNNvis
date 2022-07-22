@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from tf_keras_vis.utils.scores import CategoricalScore
+from tf_keras_vis.utils.model_modifiers import ReplaceToLinear
 
 from Main import perform_attribution, perform_feature_visualization
 from methods import method_keys
@@ -41,6 +42,21 @@ class TestCleverHans(unittest.TestCase):
         plt.savefig('clever_hans_results_captum.png')
         plt.show()
 
+    def test_captum_gradcam(self):
+        n_samples = 8
+        attr = perform_attribution(self.tf_net, method_keys.GRAD_CAM, plot=True, toolset=toolset_keys.CAPTUM,
+                                   init_args={'layer': 'Conv_1'},
+                                   exec_args={'inputs': self.x_test[:n_samples], 'target': self.y_test[:n_samples],
+                                              'relu_attributions': True})
+
+    def test_captum_layers(self):
+        n_samples = 8
+        for m in [method_keys.LAYER_INTEGRATED_GRADIENTS, method_keys.LAYER_DEEP_LIFT,
+                  method_keys.LAYER_GRADIENT_X_ACTIVATION, method_keys.LAYER_FEATURE_ABLATION]:
+            attr = perform_attribution(self.tf_net, m, plot=True, toolset=toolset_keys.CAPTUM,
+                                       init_args={'layer': 'Conv_1'},
+                                       exec_args={'inputs': self.x_test[:n_samples], 'target': self.y_test[:n_samples]})
+
     def test_tf_keras_vis(self):
         torch_net = NoDropoutNet()
         torch_net.load_state_dict(torch.load(os.path.join('..', 'models', 'torch_clever_hans.pth')))
@@ -63,11 +79,12 @@ class TestCleverHans(unittest.TestCase):
             if m == method_keys.ACTIVATION_MAXIMIZATION:
                 attr = perform_feature_visualization(torch_net, m, plot=False, toolset=toolset_keys.TF_KERAS_VIS,
                                                      dummy_input=torch_x,
+                                                     init_args={'model_modifier': ReplaceToLinear()},
                                                      exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
                                                                 'seed_input': torch_x})
             else:
                 attr = perform_attribution(torch_net, m, plot=False, toolset=toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=torch_x,
+                                           dummy_input=torch_x, init_args={'model_modifier': ReplaceToLinear()},
                                            exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
                                                       'seed_input': torch_x})
             print(type(attr))
