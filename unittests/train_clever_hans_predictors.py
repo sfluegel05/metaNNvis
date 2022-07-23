@@ -47,7 +47,6 @@ class TorchMNIST(Dataset):
 
 def train_torch_net():
     torch_net = NoDropoutNet()
-    torch_net.train()
     optimizer = optim.Adam(torch_net.parameters())
 
     (x_train, y_train), (x_test, y_test) = get_tf_data()
@@ -57,6 +56,7 @@ def train_torch_net():
     test_loader = DataLoader(test_data, batch_size=8, shuffle=True)
 
     for epoch in range(10):
+        torch_net.train()
         for batch_idx, (data, target) in enumerate(train_loader):
             optimizer.zero_grad()
             output = torch_net(data)
