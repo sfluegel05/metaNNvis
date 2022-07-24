@@ -45,6 +45,10 @@ class Tf2TorchTranslation(Translation):
             return getattr(kwargs['model'], data)
         # convert torch to torch array
         elif isinstance(data, tf.Tensor):
+            try:
+                data = data.detach().numpy()
+            except AttributeError:
+                data = data.numpy()
             if np.issubdtype(data.dtype, np.double):
                 data = data.astype(np.single)
             elif np.issubdtype(data.dtype, np.integer):
