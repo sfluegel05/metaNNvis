@@ -69,13 +69,14 @@ def tf_saliency():
     mnist_x = mnist_x[..., np.newaxis] / 255.0
 
     res_captum = perform_attribution(tf_model, methods.SALIENCY, toolset=toolsets.toolset_keys.CAPTUM,
-                                     exec_args={'inputs': mnist_x, 'target': mnist_y})
+                                     exec_args={'inputs': mnist_x[:64], 'target': mnist_y[:64]})
     res_tf_keras_vis = perform_attribution(tf_model, methods.SALIENCY, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=mnist_x, init_args={'model_modifier': ReplaceToLinear()},
-                                           exec_args={'score': CategoricalScore(mnist_y.tolist()),
-                                                      'seed_input': mnist_x, 'normalize_map': False})
+                                           dummy_input=mnist_x, init_args={},
+                                           exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
+                                                      'seed_input': mnist_x[:64], 'normalize_map': False})
     n_samples = 8  # mnist_x.shape[0]
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency', 'comparison_tf_saliency.png')
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency',
+         'comparison_tf_saliency_no_model_modifier.png')
 
 
 def tf_gradcam():
@@ -89,9 +90,9 @@ def tf_gradcam():
                                      exec_args={'inputs': mnist_x[:64], 'target': mnist_y[:64],
                                                 'relu_attributions': True})
     res_tf_keras_vis = perform_attribution(tf_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=mnist_x[:64], init_args={'model_modifier': ReplaceToLinear()},
+                                           dummy_input=mnist_x[:64], init_args={},
                                            exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
-                                                      'expand_cam': False,
+                                                      'expand_cam': False, 'penultimate_layer': 'conv2d_1',
                                                       'seed_input': mnist_x[:64], 'normalize_cam': False})
     n_samples = 8  # mnist_x.shape[0]
     plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', 'comparison_tf_gradcam.png')
@@ -124,7 +125,7 @@ def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, fi
         seaborn.heatmap(res_captum[i].squeeze() / res_tf_keras_vis[i], cmap="coolwarm", center=1,
                         xticklabels=5, yticklabels=5)
         counter += 1
-    plt.savefig(filename)
+    plt.savefig(filename, bbox_inches='tight')
     plt.show()
 
 

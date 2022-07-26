@@ -149,6 +149,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
     translated_model = translate_model(model, method_toolset.get_framework(), **kwargs)
     translated_init_args = translate_data(init_args, method_toolset.get_framework(), model, translated_model)
     translated_exec_args = translate_data(exec_args, method_toolset.get_framework(), model, translated_model)
+
     # special case: if the method requires a 'layer' argument, the layer has to be a layer from the target framework
     # model. Since this can be neither specified by the user beforehand nor determined automatically, ask the user at
     # this point to select a layer
@@ -209,7 +210,7 @@ def plot_results(attr):
             figure.add_subplot(1, n_cols, counter + 1)
             counter += 1
             plt.imshow(attr[i], cmap="gray")
-    plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png")
+    plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", bbox_inches='tight')
     plt.show()
 
 
