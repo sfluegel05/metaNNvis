@@ -44,7 +44,7 @@ def translate_model(model, to_framework, **kwargs):
     raise Exception(f'Could not find a translation from {input_key} to {to_framework}')
 
 
-def translate_data(data_dict, to_framework, original_model, translated_model):
+def translate_data(data_dict, to_framework, original_model, translated_model, translate_to_numpy=False):
     input_key = detect_model_framework(original_model)
 
     # base case: no translation needed
@@ -57,10 +57,12 @@ def translate_data(data_dict, to_framework, original_model, translated_model):
                 if isinstance(data_dict, dict):
                     return_dict = {}
                     for key, value in data_dict.items():
-                        return_dict[key] = trans.translate_data(value, model=translated_model, key=key)
+                        return_dict[key] = trans.translate_data(value, model=translated_model, key=key,
+                                                                translate_to_numpy=translate_to_numpy)
                     return return_dict
                 else:
-                    return trans.translate_data(data_dict, model=translated_model)
+                    return trans.translate_data(data_dict, model=translated_model,
+                                                translate_to_numpy=translate_to_numpy)
 
     raise Exception(f'Could not find a translation from {input_key} to {to_framework}')
 
@@ -168,7 +170,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
     if plot:
         plot_results(res)
 
-    res = translate_data(res, detect_model_framework(model), translated_model, model)
+    res = translate_data(res, detect_model_framework(model), translated_model, model, translate_to_numpy=True)
 
     return res
 

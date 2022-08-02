@@ -82,7 +82,7 @@ methods.
 
 # Bibliography
 
-- [1] Selvaraju et. al.: Grad-cam: Visual explanations from deep networks via gradient-based localization, Proceedings
+- [1] Selvaraju et. al.: Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization, Proceedings
   of the IEEE International Conference on Computer Vision (ICCV), 2017
 - [2] [Chris Olah, Alexander Mordvintsev, Ludwig Schubert: Feature Visualization, Distill, 2017](https://distill.pub/2017/feature-visualization/)
-- [3] [Mukund Sundararajan, Ankur Taly, Qiqi Yan: Axiomaticc Attribution for Deep Networks, arXiv, 2017](https://arxiv.org/abs/1703.01365)
+- [3] [Mukund Sundararajan, Ankur Taly, Qiqi Yan: Axiomatic Attribution for Deep Networks, arXiv, 2017](https://arxiv.org/abs/1703.01365)

@@ -53,12 +53,16 @@ class Tf2TorchTranslation(Translation):
                 data = data.astype(np.single)
             elif np.issubdtype(data.dtype, np.integer):
                 data = data.astype(np.int_)
+            if 'translate_to_numpy' in kwargs and kwargs['translate_to_numpy']:
+                return data
             return torch.from_numpy(data)
         elif isinstance(data, np.ndarray):
             if np.issubdtype(data.dtype, np.double):
                 data = data.astype(np.single)
             elif np.issubdtype(data.dtype, np.integer):
                 data = data.astype(np.int64)
+            if 'translate_to_numpy' in kwargs and kwargs['translate_to_numpy']:
+                return data
             return torch.from_numpy(data)
         else:
             return data

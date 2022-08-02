@@ -4,6 +4,7 @@ import torch
 import torchvision
 from tf_keras_vis.utils.scores import CategoricalScore
 from torch.utils.data import DataLoader
+import numpy as np
 
 from Main import perform_attribution, perform_feature_visualization
 from methods.method_keys import SALIENCY, GRAD_CAM, ACTIVATION_MAXIMIZATION
@@ -24,19 +25,22 @@ class TestSaliency(unittest.TestCase):
 
     def test_tf_keras_vis_saliency(self):
         res = perform_attribution(self.torch_net, SALIENCY, toolset_keys.TF_KERAS_VIS, dummy_input=self.mnist_x,
-                                  plot=True, exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
-                                                        'seed_input': self.mnist_x})
-        print(res)
+                                  plot=False, exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
+                                                         'seed_input': self.mnist_x})
+        self.assertTrue(isinstance(res, np.ndarray))
+        self.assertTupleEqual(res.shape, (8, 28, 28))
 
     def test_tf_keras_vis_gradcam(self):
         res = perform_attribution(self.torch_net, GRAD_CAM, toolset_keys.TF_KERAS_VIS, dummy_input=self.mnist_x,
-                                  plot=True, exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
-                                                        'seed_input': self.mnist_x})
-        print(res)
+                                  plot=False, exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
+                                                         'seed_input': self.mnist_x})
+        self.assertTrue(isinstance(res, np.ndarray))
+        self.assertTupleEqual(res.shape, (8, 28, 28))
 
     def test_tf_keras_vis_activation_maximization(self):
         res = perform_feature_visualization(self.torch_net, ACTIVATION_MAXIMIZATION, toolset_keys.TF_KERAS_VIS,
-                                            dummy_input=self.mnist_x, plot=True,
+                                            dummy_input=self.mnist_x, plot=False,
                                             exec_args={'score': CategoricalScore(self.mnist_y.numpy().tolist()),
                                                        'seed_input': self.mnist_x})
-        print(res)
+        self.assertTrue(isinstance(res, np.ndarray))
+        self.assertTupleEqual(res.shape, (8, 28, 28, 1))
