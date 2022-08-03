@@ -12,9 +12,10 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+import frameworks.framework_keys
 import toolsets.toolset_keys
 from unittests.TestTranslation import NoDropoutNet
-from Main import perform_attribution
+from Main import perform_attribution, translate_model, translate_data
 import methods.method_keys as methods
 
 
@@ -52,10 +53,9 @@ def torch_gradcam():
 
     res_captum = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
                                      init_args={'layer': torch_conv2},
-                                     exec_args={'inputs': mnist_x, 'target': mnist_y,
-                                                'relu_attributions': True})
+                                     exec_args={'inputs': mnist_x, 'target': mnist_y, 'relu_attributions': False})
     res_tf_keras_vis = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=mnist_x, init_args={'model_modifier': ReplaceToLinear()},
+                                           dummy_input=mnist_x,
                                            exec_args={'score': CategoricalScore(mnist_y.tolist()), 'expand_cam': False,
                                                       'seed_input': mnist_x, 'normalize_cam': False})
     n_samples = 8  # mnist_x.size()[0]
@@ -85,20 +85,24 @@ def tf_gradcam():
     (mnist_x, mnist_y), _ = tf.keras.datasets.mnist.load_data()
     mnist_x = mnist_x[..., np.newaxis] / 255.0
 
-    res_captum = perform_attribution(tf_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
-                                     init_args={'layer': 'Conv_1'},
-                                     exec_args={'inputs': mnist_x[:64], 'target': mnist_y[:64],
-                                                'relu_attributions': True})
+    torch_model = translate_model(tf_model, frameworks.framework_keys.PYTORCH)
+    torch_exec_args = translate_data({'inputs': mnist_x[:64], 'target': mnist_y[:64], 'relu_attributions': True},
+                                     frameworks.framework_keys.PYTORCH, tf_model, torch_model)
+    # torch_exec_args['inputs'] is equal to mnist_x, output of tf_model and torch_model is equal
+    res_captum = perform_attribution(torch_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
+                                     init_args={'layer': torch_model.Relu_1},
+                                     exec_args=torch_exec_args)
     res_tf_keras_vis = perform_attribution(tf_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x[:64], init_args={},
                                            exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
                                                       'expand_cam': False, 'penultimate_layer': 'conv2d_1',
                                                       'seed_input': mnist_x[:64], 'normalize_cam': False})
     n_samples = 8  # mnist_x.shape[0]
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', 'comparison_tf_gradcam.png')
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', 'comparison_tf_gradcam_03-08.png')
 
 
 def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, filename):
+    res_captum = res_captum.detach()
     figure = plt.figure(figsize=(5 * n_samples, 5 * 4))
     counter = 1
     for i in range(n_samples):
