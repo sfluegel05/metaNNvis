@@ -3,6 +3,7 @@ import os
 import seaborn
 import torch
 import torchvision
+from captum.attr import LayerAttribution
 from tf_keras_vis.utils.model_modifiers import ReplaceToLinear
 from tf_keras_vis.utils.scores import CategoricalScore
 from torch.utils.data import DataLoader
@@ -53,13 +54,15 @@ def torch_gradcam():
 
     res_captum = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
                                      init_args={'layer': torch_conv2},
-                                     exec_args={'inputs': mnist_x, 'target': mnist_y, 'relu_attributions': False})
+                                     exec_args={'inputs': mnist_x, 'target': mnist_y, 'relu_attributions': True})
+    res_captum = LayerAttribution.interpolate(res_captum, (28, 28))
     res_tf_keras_vis = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x,
-                                           exec_args={'score': CategoricalScore(mnist_y.tolist()), 'expand_cam': False,
+                                           exec_args={'score': CategoricalScore(mnist_y.tolist()), 'expand_cam': True,
                                                       'seed_input': mnist_x, 'normalize_cam': False})
     n_samples = 8  # mnist_x.size()[0]
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', 'comparison_torch_gradcam.png')
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM',
+         'comparison_torch_gradcam_scaled_to_original.png')
 
 
 def tf_saliency():
@@ -92,13 +95,15 @@ def tf_gradcam():
     res_captum = perform_attribution(torch_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
                                      init_args={'layer': torch_model.Relu_1},
                                      exec_args=torch_exec_args)
+    res_captum = LayerAttribution.interpolate(res_captum, (28, 28))
     res_tf_keras_vis = perform_attribution(tf_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x[:64], init_args={},
                                            exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
-                                                      'expand_cam': False, 'penultimate_layer': 'conv2d_1',
+                                                      'expand_cam': True, 'penultimate_layer': 'conv2d_1',
                                                       'seed_input': mnist_x[:64], 'normalize_cam': False})
     n_samples = 8  # mnist_x.shape[0]
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', 'comparison_tf_gradcam_03-08.png')
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM',
+         'comparison_tf_gradcam_scaled_to_original.png')
 
 
 def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, filename):
@@ -134,4 +139,4 @@ def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, fi
 
 
 if __name__ == '__main__':
-    tf_gradcam()
+    torch_gradcam()

@@ -1,4 +1,3 @@
-import logging
 import os.path
 import unittest
 
@@ -21,7 +20,8 @@ class TestTranslation(unittest.TestCase):
 
     def setUp(self):
         self.torch_net = NoDropoutNet()
-        self.torch_net.load_state_dict(torch.load('../project_preparation_demo/models/mnist_pytorch_24_06_22_no_dropout.pth'))
+        self.torch_net.load_state_dict(
+            torch.load('../project_preparation_demo/models/mnist_pytorch_24_06_22_no_dropout.pth'))
         self.alexNet = torchvision.models.alexnet(pretrained=True)
 
         self.mnist_train = torchvision.datasets.MNIST(os.path.join('..', 'datasets'), download=True,
@@ -98,19 +98,16 @@ class TestTranslation(unittest.TestCase):
         print(type(mobilenet_torch))
         # ! translation fails, because onnx2torch is not supporting asymmetric padding
 
-
     def test_wrong_model(self):
         """If the provided model format does not match one of the frameworks, the translation should fail"""
 
         with self.assertRaises(Exception):
             translate_model('not a model', TensorFlow2Framework.get_framework_key())
 
-
     def test_wrong_framework(self):
         """If the translation output framework does not exist, the translation should fail"""
         with self.assertRaises(Exception):
             translate_model(self.torch_net, 'not a framework', dummy_input=next(iter(self.mnist_torch)))
-
 
     def test_tf_to_tf_translation(self):
         tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
@@ -151,6 +148,7 @@ class LayerTorchConvNet(TorchConvNet):
         x5 = F.dropout(x4, training=self.training)
         x6 = self.fc2(x5)
         return [x1, x2, x3, x4, x5, x6, F.log_softmax(x6, dim=1)]
+
 
 class NoDropoutNet(nn.Module):
     def __init__(self):
