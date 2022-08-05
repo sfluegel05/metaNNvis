@@ -21,7 +21,7 @@ from Main import perform_attribution, translate_model, translate_data
 import methods.method_keys as methods
 
 
-def torch_saliency():
+def torch_saliency(use_additional_args=True):
     torch_net = NoDropoutNet()
     torch_net.load_state_dict(
         torch.load('../project_preparation_demo/models/mnist_pytorch_24_06_22_no_dropout.pth'))
@@ -33,15 +33,21 @@ def torch_saliency():
 
     res_captum = perform_attribution(torch_net, methods.SALIENCY, toolset=toolsets.toolset_keys.CAPTUM,
                                      exec_args={'inputs': mnist_x, 'target': mnist_y})
+    if use_additional_args:
+        keras_vis_init_args = {'model_modifier': ReplaceToLinear()}
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y.tolist()), 'seed_input': mnist_x,
+                               'normalize_map': False}
+    else:
+        keras_vis_init_args = {}
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y.tolist()), 'seed_input': mnist_x}
     res_tf_keras_vis = perform_attribution(torch_net, methods.SALIENCY, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=mnist_x, init_args={'model_modifier': ReplaceToLinear()},
-                                           exec_args={'score': CategoricalScore(mnist_y.tolist()),
-                                                      'seed_input': mnist_x, 'normalize_map': False})
+                                           dummy_input=mnist_x, init_args=keras_vis_init_args,
+                                           exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.size()[0]
     plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency', 'comparison_torch_saliency.png')
 
 
-def torch_gradcam(interpolate=False):
+def torch_gradcam(interpolate=False, use_additional_args=True):
     torch_net = NoDropoutNet()
     torch_net.load_state_dict(
         torch.load('../project_preparation_demo/models/mnist_pytorch_24_06_22_no_dropout.pth'))
@@ -52,22 +58,27 @@ def torch_gradcam(interpolate=False):
     mnist_torch = DataLoader(mnist_data, batch_size=64)
     mnist_x, mnist_y = next(iter(mnist_torch))
 
+    if use_additional_args:
+        captum_exec_args = {'inputs': mnist_x, 'target': mnist_y, 'relu_attributions': True}
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y.tolist()), 'seed_input': mnist_x,
+                               'normalize_cam': False, 'expand_cam': interpolate}
+    else:
+        captum_exec_args = {'inputs': mnist_x, 'target': mnist_y}
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y.tolist()), 'seed_input': mnist_x}
     res_captum = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
                                      init_args={'layer': torch_conv2},
-                                     exec_args={'inputs': mnist_x, 'target': mnist_y, 'relu_attributions': True})
+                                     exec_args=captum_exec_args)
     if interpolate:
         res_captum = LayerAttribution.interpolate(res_captum, (28, 28))
     res_tf_keras_vis = perform_attribution(torch_net, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x,
-                                           exec_args={'score': CategoricalScore(mnist_y.tolist()),
-                                                      'expand_cam': interpolate,
-                                                      'seed_input': mnist_x, 'normalize_cam': False})
+                                           exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.size()[0]
     file_name = 'comparison_torch_gradcam_scaled_to_original.png' if interpolate else 'comparison_torch_gradcam.png'
     plot(mnist_x, mnist_y.tolist(), res_captum, res_tf_keras_vis, n_samples, 'GradCAM', file_name)
 
 
-def tf_saliency():
+def tf_saliency(use_additional_args=True):
     tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
 
     (mnist_x, mnist_y), _ = tf.keras.datasets.mnist.load_data()
@@ -75,35 +86,47 @@ def tf_saliency():
 
     res_captum = perform_attribution(tf_model, methods.SALIENCY, toolset=toolsets.toolset_keys.CAPTUM,
                                      exec_args={'inputs': mnist_x[:64], 'target': mnist_y[:64]})
+    if use_additional_args:
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y[:64].tolist()), 'seed_input': mnist_x[:64],
+                               'normalize_map': False}
+    else:
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y[:64].tolist()), 'seed_input': mnist_x[:64]}
     res_tf_keras_vis = perform_attribution(tf_model, methods.SALIENCY, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x, init_args={},
-                                           exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
-                                                      'seed_input': mnist_x[:64], 'normalize_map': False})
+                                           exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.shape[0]
     plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency',
          'comparison_tf_saliency_no_model_modifier.png')
 
 
-def tf_gradcam(interpolate=False):
+def tf_gradcam(interpolate=False, use_additional_args=True):
     tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
 
     (mnist_x, mnist_y), _ = tf.keras.datasets.mnist.load_data()
     mnist_x = mnist_x[..., np.newaxis] / 255.0
 
     torch_model = translate_model(tf_model, frameworks.framework_keys.PYTORCH)
-    torch_exec_args = translate_data({'inputs': mnist_x[:64], 'target': mnist_y[:64], 'relu_attributions': True},
-                                     frameworks.framework_keys.PYTORCH, tf_model, torch_model)
+
+    if use_additional_args:
+        captum_exec_args = translate_data({'inputs': mnist_x[:64], 'target': mnist_y[:64], 'relu_attributions': True},
+                                          frameworks.framework_keys.PYTORCH, tf_model, torch_model)
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y[:64].tolist()),
+                               'expand_cam': interpolate, 'penultimate_layer': 'conv2d_1',
+                               'seed_input': mnist_x[:64], 'normalize_cam': False}
+    else:
+        captum_exec_args = translate_data({'inputs': mnist_x[:64], 'target': mnist_y[:64]},
+                                          frameworks.framework_keys.PYTORCH, tf_model, torch_model)
+        keras_vis_exec_args = {'score': CategoricalScore(mnist_y[:64].tolist()),
+                               'seed_input': mnist_x[:64]}
     # torch_exec_args['inputs'] is equal to mnist_x, output of tf_model and torch_model is equal
     res_captum = perform_attribution(torch_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.CAPTUM,
                                      init_args={'layer': torch_model.Relu_1},
-                                     exec_args=torch_exec_args)
+                                     exec_args=captum_exec_args)
     if interpolate:
         res_captum = LayerAttribution.interpolate(res_captum, (28, 28))
     res_tf_keras_vis = perform_attribution(tf_model, methods.GRAD_CAM, toolset=toolsets.toolset_keys.TF_KERAS_VIS,
                                            dummy_input=mnist_x[:64], init_args={},
-                                           exec_args={'score': CategoricalScore(mnist_y[:64].tolist()),
-                                                      'expand_cam': interpolate, 'penultimate_layer': 'conv2d_1',
-                                                      'seed_input': mnist_x[:64], 'normalize_cam': False})
+                                           exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.shape[0]
     file_name = 'comparison_tf_gradcam_scaled_to_original.png' if interpolate else 'comparison_tf_gradcam.png'
     if not isinstance(res_tf_keras_vis, np.ndarray):
@@ -173,9 +196,11 @@ def ceil_power_of_10(x):
 
 
 if __name__ == '__main__':
-    tf_gradcam()
-    tf_gradcam(True)
-    torch_gradcam()
-    torch_gradcam(True)
-    torch_saliency()
-    tf_saliency()
+    # gradcam: don't combine interpolate=False and use_additional_args=False -> without additional args, tf-keras-vis
+    # interpolates by default, leading to a size-mismatch with captum
+    # tf_gradcam(interpolate=False, use_additional_args=False)
+    tf_gradcam(interpolate=True, use_additional_args=False)
+    # torch_gradcam(interpolate=False, use_additional_args=False)
+    torch_gradcam(interpolate=True, use_additional_args=False)
+    torch_saliency(use_additional_args=False)
+    tf_saliency(use_additional_args=False)
