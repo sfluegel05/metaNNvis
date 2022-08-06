@@ -16,7 +16,7 @@ from methods.method_keys import ACTIVATION_MAXIMIZATION
 from toolsets import toolset_keys
 
 
-class TestMethods(unittest.TestCase):
+class TestMain(unittest.TestCase):
 
     def setUp(self):
         self.tf_model = tf.keras.models.load_model(os.path.join('..', 'models', 'tf_basic_cnn_mnist'))
