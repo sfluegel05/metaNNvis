@@ -3,6 +3,8 @@ import os.path
 
 import logging
 
+import seaborn
+
 from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
 from toolsets.Captum import Captum
@@ -190,7 +192,6 @@ def plot_results(attr):
     if not isinstance(attr, np.ndarray):
         attr = attr.detach().numpy()
 
-    print(attr.shape)
     n_cols = attr.shape[0]
     if len(attr.shape) == 4 and attr.shape[1] == attr.shape[2]:
         attr = np.reshape(attr, (n_cols, attr.shape[3], attr.shape[1], attr.shape[2]))
@@ -198,20 +199,21 @@ def plot_results(attr):
         figure = plt.figure(figsize=(5 * n_cols, 5 * attr.shape[1]))
     else:
         figure = plt.figure(figsize=(5 * n_cols, 5))
-    print(attr.shape)
 
     counter = 0
     for i in range(n_cols):
         if len(attr.shape) == 4:
             for c in range(attr.shape[1]):
-                figure.add_subplot(attr.shape[1], n_cols, counter + 1)
-                counter += 1
+                figure.add_subplot(attr.shape[1], n_cols, counter + 1 + c * n_cols)
                 plt.title(f'Channel {c}')
-                plt.imshow(attr[i][c], cmap="gray")
+                seaborn.heatmap(attr[i][c].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
+                                center=0, xticklabels=5, yticklabels=5)
+            counter += 1
         else:
             figure.add_subplot(1, n_cols, counter + 1)
             counter += 1
-            plt.imshow(attr[i], cmap="gray")
+            seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
+                            center=0, xticklabels=5, yticklabels=5)
     plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", bbox_inches='tight')
     plt.show()
 

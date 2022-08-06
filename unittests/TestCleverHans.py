@@ -1,5 +1,7 @@
 import os
 import unittest
+
+import seaborn
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,8 +40,9 @@ class TestCleverHans(unittest.TestCase):
                 figure.add_subplot(len(methods) + 1, n_samples, counter)
                 counter += 1
                 plt.xlabel(m)
-                plt.imshow(attr[i], cmap="gray")
-        plt.savefig('clever_hans_results_captum.png')
+                seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
+                                center=0, xticklabels=5, yticklabels=5)
+                plt.savefig('clever_hans_results_captum.png')
         plt.show()
 
     def test_captum_gradcam(self):
@@ -73,7 +76,7 @@ class TestCleverHans(unittest.TestCase):
         for i in range(n_samples):
             figure.add_subplot(len(methods) + 1, n_samples, counter)
             counter += 1
-            plt.xlabel(self.y_test[i])
+            plt.title(self.y_test[i])
             plt.imshow(self.x_test[i], cmap="gray")
         for m in methods:
             if m == method_keys.ACTIVATION_MAXIMIZATION:
@@ -87,12 +90,12 @@ class TestCleverHans(unittest.TestCase):
                                            dummy_input=torch_x, init_args={'model_modifier': ReplaceToLinear()},
                                            exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
                                                       'seed_input': torch_x})
-            print(type(attr))
             for i in range(n_samples):
                 figure.add_subplot(len(methods) + 1, n_samples, counter)
                 counter += 1
-                plt.xlabel(m)
-                plt.imshow(attr[i], cmap="gray")
+                plt.title(f'{m}')
+                seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
+                                center=0, xticklabels=5, yticklabels=5)
         plt.savefig('clever_hans_results_tfkerasvis.png')
         plt.show()
 
