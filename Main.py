@@ -22,6 +22,23 @@ TOOLSETS = [Captum, TfKerasVis]
 
 
 def detect_model_framework(model):
+    """Detects which framework a neural network belongs to.
+
+    Parameters
+    ----------
+    model : any
+        the neural network
+
+    Returns
+    -------
+    str
+        the model's framework key
+
+    Raises
+    ------
+    Exception
+        if the model matches none of the available frameworks
+    """
     for fw in FRAMEWORKS:
         if isinstance(fw(), Framework):
             if fw.is_framework_model(model):
@@ -31,6 +48,27 @@ def detect_model_framework(model):
 
 
 def translate_model(model, to_framework, **kwargs):
+    """Translates a neural network from one framework into another.
+
+    Parameters
+    ----------
+    model : any
+        the neural network
+    to_framework : str
+        the framework key of the target framework
+    kwargs : dict
+        additional arguments required for the translation
+
+    Returns
+    -------
+    translated model : any
+        a neural network in the target framework which behaves (nearly) equivalent to the input model
+
+    Raises
+    ------
+    Exception
+        if no translation between the required frameworks is available
+    """
     to_framework = to_framework.lower()
     input_key = detect_model_framework(model)
 
@@ -47,6 +85,32 @@ def translate_model(model, to_framework, **kwargs):
 
 
 def translate_data(data_dict, to_framework, original_model, translated_model, translate_to_numpy=False):
+    """Translate input / output data from one framework to another.
+
+    Parameters
+    ----------
+    data_dict : {dict, array-like}
+        the data to be translated, if it is a dict, each value is translated individually
+    to_framework : str
+        the key of the target framework
+    original_model : any
+        the model before the model translation (used to determine which framework the data belongs to)
+    translated_model : any
+        the model after the model translation (used to fit the data shape to the model's required input shape)
+    translate_to_numpy : bool, optional
+        if True, don't translate to the to_framework, but to a numpy array, default: False
+
+    Returns
+    -------
+    {dict, array-like}
+        the translation of data_dict
+
+    Raises
+    ------
+    Exception
+        if no translation between the model's framework and the target framework can be found
+
+    """
     input_key = detect_model_framework(original_model)
 
     # base case: no translation needed
@@ -70,18 +134,110 @@ def translate_data(data_dict, to_framework, original_model, translated_model, tr
 
 
 def perform_attribution(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False, **kwargs):
+    """Finds and executes an attribution method that fits the method_key, translates model and input data if needed.
+
+    Parameters
+    ----------
+    model : any
+        the neural network on which to perform the attribution
+    method_key : str
+        the attribution method to perform
+    toolset : str, optional
+        the toolset from which the attribution method should be selected. If the given toolset doesn't contain the
+        given method, another toolset is chosen. If no toolset is given, the toolset which doesn't require a translation
+        is prioritized.
+    init_args : dict, optional
+        the arguments to initialize the attribution method
+    exec_args : dict, optional
+        the arguments to execute the attribution method
+    plot : bool, optional
+        if True, plot the attribution results as a heat map
+    kwargs : dict
+        additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
+
+    Returns
+    -------
+    res : numpy.ndarray
+        the output of the attribution method, translated to a numpy array
+    """
     return execute(model, method_key, toolset, init_args, exec_args, plot,
                    method_type=AbstractAttributionMethod.get_method_type(), **kwargs)
 
 
 def perform_feature_visualization(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False,
                                   **kwargs):
+    """Finds and executes a feature visualization method that fits the method_key, translates model and input data if
+    needed.
+
+    Parameters
+    ----------
+    model : any
+        the neural network on which to perform the feature visualization
+    method_key : str
+        the feature visualization method to perform
+    toolset : str, optional
+        the toolset from which the feature visualization method should be selected. If the given toolset doesn't contain
+        the given method, another toolset is chosen. If no toolset is given, the toolset which doesn't require a
+        translation is prioritized.
+    init_args : dict, optional
+        the arguments to initialize the feature visualization method
+    exec_args : dict, optional
+        the arguments to execute the feature visualization method
+    plot : bool, optional
+        if True, plot the feature visualization results as a heat map
+    kwargs : dict
+        additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
+
+    Returns
+    -------
+    res : numpy.ndarray
+        the output of the feature visualization method, translated to a numpy array
+    """
     return execute(model, method_key, toolset, init_args, exec_args, plot,
                    method_type=AbstractFeatureVisualizationMethod.get_method_type(), **kwargs)
 
 
 def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plot=False,
             method_type=AbstractAttributionMethod.get_method_type(), **kwargs):
+    """Finds and executes an introspection method that fits the method_key, translates model and input data if needed.
+
+    Note that this method is not supposed to be called directly, but is just a helper method for perform_attribution()
+    and perform_feature_visualization().
+
+    Parameters
+    ----------
+    model : any
+        the neural network on which to perform the introspection
+    method_key : str
+        the introspection method to perform
+    toolset : str, optional
+        the toolset from which the introspection method should be selected. If the given toolset doesn't contain the
+        given method, another toolset is chosen. If no toolset is given, the toolset which doesn't require a translation
+        is prioritized.
+    init_args : dict, optional
+        the arguments to initialize the introspection method
+    exec_args : dict, optional
+        the arguments to execute the introspection method
+    plot : bool, optional
+        if True, plot the introspection results as a heat map
+    method_type : {'attribution', 'feature_visualization'}
+        the method type. Only methods that have the correct type are considered.
+    kwargs : dict
+        additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
+
+    Returns
+    -------
+    res : {numpy.ndarray, dict}
+        if the method is a Captum layer method and the init_args don't contain a 'layer' key, a dict with the
+        intermediate translation results is returned, otherwise it is the output of the introspection method,
+        translated to a numpy array
+
+    Raises
+    ------
+    Exception
+        if there is no method which fits the method_key, if the model doesn't belong to one of the known frameworks or
+        if required init_args / exec_args are missing
+    """
     if init_args is None:
         init_args = {}
     if exec_args is None:
@@ -178,6 +334,21 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
 
 
 def finish_execution_with_layer(intermediate_output, layer_key):
+    """Rerun execute with an additional layer argument that depends on the model translation.
+
+    Parameters
+    ----------
+    intermediate_output : dict
+        the output of perform_attribution(), containing the method to be executed and the translated model and arguments
+    layer_key : str
+        the key of the model layer for which the method should be executed
+
+    Returns
+    -------
+    numpy.ndarray
+        the method's output, translated to numpy
+
+    """
     model = intermediate_output['translated_model']
     init_args = intermediate_output['translated_init_args']
     init_args['layer'] = getattr(model, layer_key)
@@ -185,6 +356,18 @@ def finish_execution_with_layer(intermediate_output, layer_key):
 
 
 def plot_results(attr):
+    """Plots the introspection results.
+
+    The first dimension is assumed to be the batch-dimension, each row in the plot corresponds to one element in the
+    batch. If attr is 4-dimensional, the second dimension (or the forth, if the second and third are equal) is used as
+    the channel dimension with one column per channel. The plot is displayed and saved in a time-stamped file.
+
+    Parameters
+    ----------
+    attr : array-like
+        The output of some introspection method
+
+    """
     import matplotlib.pyplot as plt
     import datetime
     import numpy as np
@@ -216,32 +399,3 @@ def plot_results(attr):
                             center=0, xticklabels=5, yticklabels=5)
     plt.savefig(f"res_plot{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png", bbox_inches='tight')
     plt.show()
-
-
-if __name__ == "__main__":
-    import tensorflow as tf
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
-
-    # Rescale the images from [0,255] to the [0.0,1.0] range.
-    x_train = x_train[..., np.newaxis] / 255.0
-
-    for i in range(y_train.size):
-        x_train[i, :5, :5] = y_train[i] / 10
-
-    figure = plt.figure(figsize=(10, 10))
-    figure.add_subplot(2, 2, 1)
-    plt.imshow(x_train[4], cmap="gray")
-    figure.add_subplot(2, 2, 2)
-    plt.imshow(x_train[5], cmap="gray")
-    figure.add_subplot(2, 2, 3)
-    plt.imshow(x_train[6], cmap="gray")
-    figure.add_subplot(2, 2, 4)
-    plt.imshow(x_train[7], cmap="gray")
-    plt.show()
-
-    # print(execute(tf_model, 'integrated_gradients', toolset='captum'))
-    # print(execute(tf_model, 'gradiated_integers'))
-    # print(execute(tf_model, 'integrated_gradients', toolset='tf-keras-vis')) # should put out a warning and use the correct toolset
