@@ -148,7 +148,7 @@ Beside these strictly neccessary features, there are a few additionally requirem
 - **Error handling**
 - **Plotting of results**
 
-To achieve these goals, we have decided on the structure shown in todo
+To achieve these goals, we have decided on the structure shown in [Figure 2](#figure2).
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
@@ -163,25 +163,32 @@ the [Open Neural Network Exchange](https://onnx.ai/) (ONNX) format. ONNX has bee
 interoperable with a wide range of different frameworks including PyTorch and TensorFlow. Another advantage are the
 already existing libraries for conversion of models between ONNX and other frameworks, four of which are used here:
 [**torch.onnx**](https://pytorch.org/docs/stable/onnx.html) is part of PyTorch and converts models from PyTorch to ONNX.
-These ONNX models are subsequentially converted to the TensorFlow Keras format by [**
-onnx2keras**](https://github.com/AxisCommunications/onnx-to-keras), a library developed
+These ONNX models are subsequentially converted to the TensorFlow Keras format by **[
+onnx2keras](https://github.com/AxisCommunications/onnx-to-keras)**, a library developed
 by [Axis Communications](https://www.axis.com/). However, because some changes were neccessary to fit this library into
 the translation process, we are using a [forked version](https://github.com/sfluegel05/onnx-to-keras/tree/dev) of
 onnx2keras.
 
-For the translation process from Tensorflow to PyTorch, we employ [**
-tensorflow-onnx**](https://github.com/onnx/tensorflow-onnx), a library directly provided by ONNX, and [**
-onnx2torch**](https://pypi.org/project/onnx2torch/), which has been developed by [**enot.ai**](https://enot.ai/). All
+For the translation process from Tensorflow to PyTorch, we employ **[
+tensorflow-onn](https://github.com/onnx/tensorflow-onnx)**, a library directly provided by ONNX, and **[
+onnx2torch](https://pypi.org/project/onnx2torch/)**, which has been developed by [**enot.ai**](https://enot.ai/). All
 mentioned libraries are accessible open-source.
 
 Regarding the internal structure, note that the translation classes, as well as methods and toolsets have abstract
 superclasses which provide an interface to the other functions. This ensures the tool's extensibility, since new
 methods, toolsets or even complete frameworks can be added as new subclasses with minimal additional effort.
 
-Now, let's take a look at how these components work together when a user wants to execute a Captum method with a
-TensorFlow model. The execution of a tf-keras-vis method in combination with a PyTorch model works analogous. The
-process is also described in [Figure 3](#figure3) (todo).
+Now, let's take a look at how these components work together when a user wants to execute an introspection method with a
+model from an incongruous framework. The process is also described in [Figure 3](#figure3).
 
+<div class="row" style="display: flex">
+<div class="column" style="padding: 10px;">
+<img id="figure3" src="report_images/cfi_activity_19-08-22.png" alt="Figure 3: The process for executing an introspection method with different parameters." width=100%/>
+<div text-align=center class="caption">Figure 3: The process for executing an introspection method with different parameters.</div>
+</div>
+</div>
+
+todo: text description
 
 
 <div style="display:none">
@@ -190,14 +197,51 @@ notes:
 - tool implementation (component / activity diagram?)
 - relevant projects: onnx (torch.onnx, tf-onnx), onnx2keras, onnx2torch, tf-keras-vis, Captum
 - refer to documentation for implementation details / usage
-</div>
-
-# Evaluation
-
+eval:
 - clever hans results
 - activation maximization
 - framework comparison
 - tool limitations
+</div>
+
+# Evaluation
+
+## Clever Hans
+
+In order to evaluate if the results gained from executing an introspection method on a translated model actually yield
+useful insights into the original model, we trained a CNN model (todo: link) on a modified MNIST
+dataset ([LeCun et. al., 1998](#lecun1998)) with permutated labels and 5x5 grey squares in the top left corner, their
+lightness correlating with the newly assigned label. This way, we can safely assume that the model only learns to use
+the top left corner when making a prediction.
+
+We then used the trained model to test different attribution methods. For the Captum methods, the model has been
+implemented and trained in TensorFlow and for the tf-keras-vis methods in PyTorch.
+
+The results for the primary attribution methods can be seen in [Figure 4](#fig:clever_hans). As can be seen, most
+methods indicate a strong focus of the network of the top left corner. (todo: why not tf-keras-vis gradcam?)
+[Figure 5](#fig:clever_hans_layer) shows the results of layer attribution methods for the first convolutional layer.
+Here, out of 20 channels, some are only react to the to top left corner (such as channels 16 and 18) while some show a
+random behaviour (like channel 19) or no activation at all.
+
+Overall, these results indicate that the translation of models between PyTorch and TensorFlow doesn't interfere with the
+introspection methods' abilities to correctly attribute activations. This goes both for primary methods using the whole
+model as well as for methods working for a certain layer (or neuron in that layer).
+
+<div class="row" style="display: flex">
+<div class="column" style="padding: 10px;">
+<img id="fig:clever_hans" src="report_images/clever_hans_results_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image." width=100%/>
+<div text-align=center class="caption">Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image.</div>
+</div>
+</div>
+
+<div class="row" style="display: flex">
+<div class="column" style="padding: 10px;">
+<img id="fig:clever_hans_layer" src="report_images/clever_hans_captum_layer_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image." width=100%/>
+<div text-align=center class="caption">Figure 5: The outputs of different Captum Layer attribution methods for the first convolution layer of our CNN. The same input picture was used as in <a href="#fig:clever_hans">Figure 4</a>. Only 4 out of 20 channels are shown in this grafic.</div>
+</div>
+</div>
+
+# Limitations
 
 # Conclusion
 
@@ -208,3 +252,4 @@ notes:
 - <div id="olah2017"><a href="https://distill.pub/2017/feature-visualization/">Chris Olah, Alexander Mordvintsev, Ludwig Schubert: Feature Visualization, Distill, 2017</a></div>
 - <div id="sundararajan2017"><a href="https://arxiv.org/abs/1703.01365">Mukund Sundararajan, Ankur Taly, Qiqi Yan: Axiomatic Attribution for Deep Networks, arXiv, 2017</a></div>
 - <div id="narine2020"><a href="https://arxiv.org/abs/2009.07896">Kokhlikyan et al.: Captum: A Unified and Generic Model Interpretability Library for PyTorch</a></div>
+- <div id="lecun1998"><a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Yann LeCun et al.: Gradient-based learning applied to document recognition</a></div>

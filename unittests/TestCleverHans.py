@@ -85,6 +85,12 @@ class TestCleverHans(unittest.TestCase):
                                                      init_args={'model_modifier': ReplaceToLinear()},
                                                      exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
                                                                 'seed_input': torch_x})
+            elif m == method_keys.GRAD_CAM:
+                attr = perform_attribution(torch_net, m, plot=False, toolset=toolset_keys.TF_KERAS_VIS,
+                                           dummy_input=torch_x, init_args={'model_modifier': ReplaceToLinear()},
+                                           exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
+                                                      'seed_input': torch_x, 'normalize_cam': False,
+                                                      'expand_cam': False})
             else:
                 attr = perform_attribution(torch_net, m, plot=False, toolset=toolset_keys.TF_KERAS_VIS,
                                            dummy_input=torch_x, init_args={'model_modifier': ReplaceToLinear()},

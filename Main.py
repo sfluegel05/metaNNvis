@@ -56,7 +56,7 @@ def translate_model(model, to_framework, **kwargs):
         the neural network
     to_framework : str
         the framework key of the target framework
-    kwargs : dict
+    **kwargs : dict
         additional arguments required for the translation
 
     Returns
@@ -152,7 +152,7 @@ def perform_attribution(model, method_key, toolset=None, init_args=None, exec_ar
         the arguments to execute the attribution method
     plot : bool, optional
         if True, plot the attribution results as a heat map
-    kwargs : dict
+    **kwargs : dict
         additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
 
     Returns
@@ -185,7 +185,7 @@ def perform_feature_visualization(model, method_key, toolset=None, init_args=Non
         the arguments to execute the feature visualization method
     plot : bool, optional
         if True, plot the feature visualization results as a heat map
-    kwargs : dict
+    **kwargs : dict
         additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
 
     Returns
@@ -222,7 +222,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
         if True, plot the introspection results as a heat map
     method_type : {'attribution', 'feature_visualization'}
         the method type. Only methods that have the correct type are considered.
-    kwargs : dict
+    **kwargs : dict
         additional arguments for the translation (e.g., a 'dummy input' for the Torch2TfTranslation)
 
     Returns

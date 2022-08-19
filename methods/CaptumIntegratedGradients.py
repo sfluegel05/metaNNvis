@@ -1,27 +1,31 @@
 from captum.attr import IntegratedGradients, LayerIntegratedGradients
 
+from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import INTEGRATED_GRADIENTS
 
 
-def get_method_key():
-    return INTEGRATED_GRADIENTS
+class CaptumIntegratedGradients(AbstractAttributionMethod):
 
+    @staticmethod
+    def get_method_key():
+        return INTEGRATED_GRADIENTS
 
-def execute(model, init_args=None, exec_args=None):
-    if exec_args is None:
-        exec_args = {}
-    if init_args is None:
-        init_args = {}
+    @staticmethod
+    def execute(model, init_args=None, exec_args=None):
+        if exec_args is None:
+            exec_args = {}
+        if init_args is None:
+            init_args = {}
 
-    if 'layer' in init_args:
-        print(model.Conv_0)
-        ig = LayerIntegratedGradients(model, layer=model.Conv_0)
-    else:
-        ig = IntegratedGradients(model, **init_args)
-    attribution = ig.attribute(**exec_args)
+        if 'layer' in init_args:
+            print(model.Conv_0)
+            ig = LayerIntegratedGradients(model, layer=model.Conv_0)
+        else:
+            ig = IntegratedGradients(model, **init_args)
+        attribution = ig.attribute(**exec_args)
 
-    return attribution
+        return attribution
 
-
-def get_required_exec_keys():
-    return ['inputs']
+    @staticmethod
+    def get_required_exec_keys():
+        return ['inputs']
