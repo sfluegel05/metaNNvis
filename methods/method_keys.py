@@ -20,3 +20,16 @@ FEATURE_PERMUTATION = 'feature_permutation'
 GRAD_CAM = 'grad_cam'
 
 ACTIVATION_MAXIMIZATION = 'activation_maximization'
+
+GRADIENT_SHAP = 'gradient_shap'
+LAYER_GRADIENT_SHAP = 'layer_gradient_shap'
+NEURON_GRADIENT_SHAP = 'neuron_gradient_shap'
+
+DECONVOLUTION = 'deconvolution'
+NEURON_DECONVOLUTION = 'neuron_deconvolution'
+
+LAYER_CONDUCTANCE = 'layer_conductance'
+NEURON_CONDUCTANCE = 'neuron_conductance'
+
+LAYER_ACTIVATION = 'layer_activation'
+NEURON_GRADIENT = 'neuron_gradient'

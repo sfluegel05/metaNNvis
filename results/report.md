@@ -167,7 +167,7 @@ These ONNX models are subsequentially converted to the TensorFlow Keras format b
 onnx2keras](https://github.com/AxisCommunications/onnx-to-keras)**, a library developed
 by [Axis Communications](https://www.axis.com/). However, because some changes were neccessary to fit this library into
 the translation process, we are using a [forked version](https://github.com/sfluegel05/onnx-to-keras/tree/dev) of
-onnx2keras.
+onnx2keras. (todo: explain process of getting to this solution)
 
 For the translation process from Tensorflow to PyTorch, we employ **[
 tensorflow-onn](https://github.com/onnx/tensorflow-onnx)**, a library directly provided by ONNX, and **[
@@ -223,10 +223,6 @@ methods indicate a strong focus of the network of the top left corner. (todo: wh
 Here, out of 20 channels, some are only react to the to top left corner (such as channels 16 and 18) while some show a
 random behaviour (like channel 19) or no activation at all.
 
-Overall, these results indicate that the translation of models between PyTorch and TensorFlow doesn't interfere with the
-introspection methods' abilities to correctly attribute activations. This goes both for primary methods using the whole
-model as well as for methods working for a certain layer (or neuron in that layer).
-
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
 <img id="fig:clever_hans" src="report_images/clever_hans_results_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image." width=100%/>
@@ -236,10 +232,46 @@ model as well as for methods working for a certain layer (or neuron in that laye
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="fig:clever_hans_layer" src="report_images/clever_hans_captum_layer_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image." width=100%/>
+<img id="fig:clever_hans_layer" src="report_images/clever_hans_captum_layer_collage.png" alt="Figure 5: The outputs of different Captum Layer attribution methods for the first convolution layer of our CNN. The same input picture was used as in Figure 4. Only 4 out of 20 channels are shown in this grafic." width=100%/>
 <div text-align=center class="caption">Figure 5: The outputs of different Captum Layer attribution methods for the first convolution layer of our CNN. The same input picture was used as in <a href="#fig:clever_hans">Figure 4</a>. Only 4 out of 20 channels are shown in this grafic.</div>
 </div>
 </div>
+
+Overall, these results indicate that the translation of models between PyTorch and TensorFlow doesn't interfere with the
+introspection methods' abilities to correctly attribute activations. This goes both for primary methods using the whole
+model as well as for methods working for a certain layer (or neuron in that layer).
+
+## Comparison between Toolsets
+
+Another interesting use case for Cross-Framework Introspection is comparing implementations of the same methods in
+different frameworks. Since we can translate models between frameworks, we can apply implementations from Captum and
+tf-keras-vis to the same model. Specifically, we have compared the implementations of GradCAM and Saliency with models
+from both PyTorch and Tensorflow, since these methods are implemented in both toolsets.
+
+### Saliency
+
+Saliency Maps ([Simonyan, 2013](#simonyan2013)) are a basic visualization method for neural networks which use the
+gradient of the class score with regard to the input image.
+
+For our purposes, we trained both a TensorFlow and a PyTorch model on the MNIST dataset and applied the Saliency
+implementations of Captum and tf-keras-vis to them.
+[Figure 6](#fig:comparison_saliency) shows the results for one input image. For both models, the results from Captum and
+tf-keras-vis are nearly equal when the correct parameters are used (see last row, columns 1 and 3). The remaining
+difference, which is several orders of magnitude lower than the method output, can be attributed to minor numerical
+differences resulting from the model translation process. If the default parameters are used, the difference between the
+Captum and tf-keras-vis results is significantly larger (see columns 2 and 4). This happens because tf-keras-vis has
+a `normalize_map` parameters that defaults to `true`, which scales the Saliency Map to values between 0 and 1.
+
+<div class="row" style="display: flex">
+<div class="column" style="padding: 10px;">
+<img id="fig:comparison_saliency" src="report_images/comparison_saliency_collage.png" alt="Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns shown (from left to right): TF model and methods with additional parameters, TF model and methods with default parameters, Torch model and methods with additional parameters, Torch model and methods with default parameters." width=100%/>
+<div text-align=center class="caption">Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns shown (from left to right): TF model and methods with additional parameters, TF model and methods with default parameters, Torch model and methods with additional parameters, Torch model and methods with default parameters.</div>
+</div>
+</div>
+
+### GradCAM
+
+([Selvaraju, 2017](#selvaraju2017))
 
 # Limitations
 
@@ -247,9 +279,10 @@ model as well as for methods working for a certain layer (or neuron in that laye
 
 # Bibliography
 
-- <div id="selvaraju2017">Selvaraju et al.: Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization, Proceedings
-  of the IEEE International Conference on Computer Vision (ICCV), 2017</div>
 - <div id="olah2017"><a href="https://distill.pub/2017/feature-visualization/">Chris Olah, Alexander Mordvintsev, Ludwig Schubert: Feature Visualization, Distill, 2017</a></div>
 - <div id="sundararajan2017"><a href="https://arxiv.org/abs/1703.01365">Mukund Sundararajan, Ankur Taly, Qiqi Yan: Axiomatic Attribution for Deep Networks, arXiv, 2017</a></div>
-- <div id="narine2020"><a href="https://arxiv.org/abs/2009.07896">Kokhlikyan et al.: Captum: A Unified and Generic Model Interpretability Library for PyTorch</a></div>
-- <div id="lecun1998"><a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Yann LeCun et al.: Gradient-based learning applied to document recognition</a></div>
+- <div id="narine2020"><a href="https://arxiv.org/abs/2009.07896">Kokhlikyan et al.: Captum: A Unified and Generic Model Interpretability Library for PyTorch, arXiv, 2020</a></div>
+- <div id="lecun1998"><a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Yann LeCun et al.: Gradient-based Learning Applied to Document Recognition, IEEE, 1998</a></div>
+- <div id="simonyan2013"><a href="https://arxiv.org/abs/1312.6034">Karen Simonyan, Andrea Vedaldi, Andrew Zisserma: Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps, arXiv, 2013</a></div>
+- <div id="selvaraju2017"><a href="https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html">Ramprasaath R. Selvaraju et. al.: Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization, Proceedings
+  of the IEEE International Conference on Computer Vision (ICCV), 2017</a></div>
