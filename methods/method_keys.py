@@ -18,6 +18,9 @@ NEURON_FEATURE_ABLATION = 'neuron_feature_ablation'
 FEATURE_PERMUTATION = 'feature_permutation'
 
 GRAD_CAM = 'grad_cam'
+GRAD_CAM_PLUS_PLUS = 'grad_cam++'
+SCORE_CAM = 'score_cam'
+LAYER_CAM = 'layer_cam'
 
 ACTIVATION_MAXIMIZATION = 'activation_maximization'
 
