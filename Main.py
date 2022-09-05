@@ -321,7 +321,7 @@ def execute(model, method_key, toolset=None, init_args=None, exec_args=None, plo
                         f'{[elem for elem in dict(translated_model.named_children()).keys()]}'
                         f' as the \'layer_key\'')
         return {'method': method, 'translated_model': translated_model, 'translated_init_args': translated_init_args,
-                'translated_exec_args': translated_exec_args}
+                'translated_exec_args': translated_exec_args, 'plot': plot}
 
     res = method.execute(translated_model, translated_init_args, translated_exec_args)
 
@@ -352,7 +352,13 @@ def finish_execution_with_layer(intermediate_output, layer_key):
     model = intermediate_output['translated_model']
     init_args = intermediate_output['translated_init_args']
     init_args['layer'] = getattr(model, layer_key)
-    return intermediate_output['method'].execute(model, init_args, intermediate_output['translated_exec_args'])
+
+    res = intermediate_output['method'].execute(model, init_args, intermediate_output['translated_exec_args'])
+
+    if intermediate_output['plot']:
+        plot_results(res)
+
+    return res
 
 
 def plot_results(attr):
