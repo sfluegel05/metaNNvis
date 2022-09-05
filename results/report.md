@@ -106,7 +106,7 @@ Captum and tf-keras-vis. The result can be seen in the table below.
 | Shapley Value Sampling  | primary | <span style="color:red">leave out</span> |
 | Lime  | primary | <span style="color:red">leave out</span> |
 | KernelShap  | primary | <span style="color:red">leave out</span> |
-| LRP [todo ausschreiben] | primary, layer  | <span style="color:red">leave out</span> | 
+| Layer Relevance Propagation | primary, layer  | <span style="color:red">leave out</span> | 
 | Conductance | layer, neuron | <span style="color:yellow">later</span> |
 | Layer Activation  | layer | <span style="color:yellow">later</span> |
 | Internal Influence  | layer | <span style="color:red">leave out</span> |
@@ -120,8 +120,9 @@ Captum and tf-keras-vis. The result can be seen in the table below.
 | ScoreCAM  | attribution | <span style="color:yellow">later</span> |
 | LayerCAM  | attribution | <span style="color:yellow">later</span> |
 
-_Include_ marks methods which are important and were implemented right away. Methods marked as _later_ are considered to
-be useful and should be implemented as well, but are not considered essential to the project.
+_Include_ marks methods which are important and were implemented right away. These methods have also been used for
+the [evaluation](#evaluation) Methods marked as _later_ are considered to be useful, but not essential to the project.
+Those methods are implemented as well, but not part of the evaluation.
 _Leave out_ is used for methods which are deemed not important for this project and thusly are not integrated into the
 tool.
 
@@ -231,8 +232,6 @@ a plot of the results is created as well.
 </div>
 </div>
 
-todo: mention additional features (e.g., method_key via constant, plotting)
-
 <div style="display:none">
 notes:
 - goals
@@ -312,6 +311,7 @@ a `normalize_map` parameter that defaults to `true`, which scales the Saliency M
 </div>
 </div>
 
+
 ### GradCAM
 
 Gradient-weighted Class Activation Mapping (Grad-CAM) ([Selvaraju, 2017](#selvaraju2017)) is an attribution method for
@@ -339,9 +339,9 @@ interpolation.
 </div>
 </div>
 
-# Limitations
-
 # Conclusion
+
+todo
 
 # Bibliography
 
