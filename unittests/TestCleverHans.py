@@ -23,25 +23,33 @@ class TestCleverHans(unittest.TestCase):
 
     def test_captum(self):
         n_samples = 8
-        methods = [method_keys.INTEGRATED_GRADIENTS, method_keys.SALIENCY, method_keys.DEEP_LIFT,
-                   method_keys.INPUT_X_GRADIENT, method_keys.FEATURE_ABLATION, method_keys.FEATURE_PERMUTATION]
+        methods = [(method_keys.INTEGRATED_GRADIENTS, 'Integrated Gradients'), (method_keys.SALIENCY, 'Saliency'),
+                   (method_keys.DEEP_LIFT, 'Deep Lift'), (method_keys.INPUT_X_GRADIENT, 'Input x Gradient'),
+                   (method_keys.FEATURE_ABLATION, 'Feature Ablation'),
+                   (method_keys.FEATURE_PERMUTATION, 'Feature Permutation')]  # (method_keys.GRAD_CAM, 'Grad-CAM')]
         figure = plt.figure(figsize=(5 * n_samples, 5 * (len(methods) + 1)))
         counter = 1
         for i in range(n_samples):
             figure.add_subplot(len(methods) + 1, n_samples, counter)
             counter += 1
-            plt.xlabel(self.y_test[i])
+            plt.title(f'Label: {self.y_test[i]}')
             plt.imshow(self.x_test[i], cmap="gray")
-        for m in methods:
-            attr = perform_attribution(self.tf_net, m, plot=False, toolset=toolset_keys.CAPTUM,
-                                       exec_args={'inputs': self.x_test[:n_samples], 'target': self.y_test[:n_samples]})
-            print(type(attr))
+        for m, method_label in methods:
+            if m == method_keys.GRAD_CAM:
+                attr = perform_attribution(self.tf_net, m, plot=False, toolset=toolset_keys.CAPTUM,
+                                           exec_args={'inputs': self.x_test[:n_samples], 'relu_attributions': True,
+                                                      'target': self.y_test[:n_samples]})
+            else:
+                attr = perform_attribution(self.tf_net, m, plot=False, toolset=toolset_keys.CAPTUM,
+                                           exec_args={'inputs': self.x_test[:n_samples],
+                                                      'target': self.y_test[:n_samples]})
             for i in range(n_samples):
                 figure.add_subplot(len(methods) + 1, n_samples, counter)
                 counter += 1
-                plt.xlabel(m)
+                plt.title(f'Captum {method_label}')
                 seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
-                                center=0, xticklabels=5, yticklabels=5)
+                                center=0, xticklabels=5, yticklabels=5, square=True,
+                                cbar_kws={'shrink': 0.8, 'pad': 0.05})
                 plt.savefig('clever_hans_results_captum.png')
         plt.show()
 
@@ -70,10 +78,10 @@ class TestCleverHans(unittest.TestCase):
         torch_x = torch_x.reshape((torch_x.shape[0], torch_x.shape[3], torch_x.shape[1], torch_x.shape[2]))
         torch_x = torch.from_numpy(torch_x)
 
-        methods = [  # method_keys.SALIENCY,
-            method_keys.GRAD_CAM,
-            # method_keys.ACTIVATION_MAXIMIZATION
-        ]
+        methods = [method_keys.SALIENCY,
+                   method_keys.GRAD_CAM,
+                   # method_keys.ACTIVATION_MAXIMIZATION
+                   ]
         figure = plt.figure(figsize=(5 * n_samples, 5 * (len(methods) + 1)))
         counter = 1
         for i in range(n_samples):
@@ -90,7 +98,7 @@ class TestCleverHans(unittest.TestCase):
                                                                 'seed_input': torch_x})
             elif m == method_keys.GRAD_CAM:
                 attr = perform_attribution(torch_net, m, plot=False, toolset=toolset_keys.TF_KERAS_VIS,
-                                           dummy_input=torch_x, init_args={'model_modifier': ReplaceToLinear()},
+                                           dummy_input=torch_x, init_args={},
                                            exec_args={'score': CategoricalScore(self.y_test[:8].tolist()),
                                                       'seed_input': torch_x, 'normalize_cam': False,
                                                       'expand_cam': False})
@@ -102,9 +110,15 @@ class TestCleverHans(unittest.TestCase):
             for i in range(n_samples):
                 figure.add_subplot(len(methods) + 1, n_samples, counter)
                 counter += 1
-                plt.title(f'{m}')
+                if m == method_keys.GRAD_CAM:
+                    plt.title(f'tf-keras-vis Grad-CAM')
+                elif m == method_keys.SALIENCY:
+                    plt.title(f'tf-keras-vis Saliency')
+                else:
+                    plt.title(f'tf-keras-vis {m}')
                 seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
-                                center=0, xticklabels=5, yticklabels=5)
+                                center=0, xticklabels=5, yticklabels=5, square=True,
+                                cbar_kws={'shrink': 0.76, 'pad': 0.05})
         plt.savefig('clever_hans_results_tfkerasvis.png')
         plt.show()
 
