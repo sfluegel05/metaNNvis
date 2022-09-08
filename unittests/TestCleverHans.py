@@ -70,7 +70,10 @@ class TestCleverHans(unittest.TestCase):
         torch_x = torch_x.reshape((torch_x.shape[0], torch_x.shape[3], torch_x.shape[1], torch_x.shape[2]))
         torch_x = torch.from_numpy(torch_x)
 
-        methods = [method_keys.SALIENCY, method_keys.GRAD_CAM, method_keys.ACTIVATION_MAXIMIZATION]
+        methods = [  # method_keys.SALIENCY,
+            method_keys.GRAD_CAM,
+            # method_keys.ACTIVATION_MAXIMIZATION
+        ]
         figure = plt.figure(figsize=(5 * n_samples, 5 * (len(methods) + 1)))
         counter = 1
         for i in range(n_samples):

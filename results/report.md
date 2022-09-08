@@ -1,6 +1,8 @@
 Blog Report Cross-Framework-Introspection
 ---
 
+todo: toolname -> MetaNNvis
+
 # Introduction
 
 Over the last years, neural networks have grown ever the more powerful and complex. Their structure allows them to be
@@ -71,83 +73,102 @@ each framework, Captum from PyTorch and tf-keras-vis from TensorFlow. We will ta
 following:
 
 ## Captum
-todo
-- [(Narine et al., 2020)](#narine2020)
-- open source, extendable, generic
-- input / layer / neuron attribution
-- gradient vs pertubation based
-- not only applicable to image tasks
--
+
+Captum [(Narine et al., 2020)](#narine2020) is a generic interpretability library for PyTorch models. It features
+implementations of various attribution methods, which it divides into primary, layer and neuron methods, meaning that
+methods are measuring the importance of either the input, a model layer or a particular neuron. Additionality, Captum
+provides evaluation metrics and a visualisation tool for these methods. The library can be applied to different
+NN-tasks, including classification and non-classification models as well as different input modalities. Captum is
+open-source and built to be extensible by new algorithms.
 
 ## tf-keras-vis
 
+The open-source library [tf-keras-vis](https://github.com/keisen/tf-keras-vis) contains visualisation methods for
+TensorFlow 2.0 models. It supports both feature visualisation with activation maximisation as well as attribution
+methods, more precisely saliency maps and different variants of class activation maps. tf-keras-vis has been developed
+for image inputs and has been designed to be light-weight and flexible.
+
 ## Method selection
 
-Especially Captum implements a large number of methods, 36 in total counting primary, layer and neuron variants
+Especially Captum implements a large number of methods: 36 in total, counting primary, layer and neuron variants
 seperately. In order to limit the scope of this project, I have chosen prioritize the introspection methods provided by
 Captum and tf-keras-vis. The result can be seen in the table below.
 
 | Method  | Category  | Priority  |
 | --- | --- | --- |
 | **Captum** |||
-| Integrated Gradients  |    primary, layer, neuron  | <span style="color:green">include</span> |
-| Saliency  | primary | <span style="color:green">include</span> |
-| DeepLift  | primary, layer, neuron  | <span style="color:green">include</span> |
-| DeepLiftShap  | primary, layer, neuron  | <span style="color:red">leave out</span> |
-| GradientShap  | primary, layer, neuron  | <span style="color:yellow">later</span> |
-| Input X Gradient  | primary | <span style="color:green">include</span> |
-| Gradient X Activation | layer | <span style="color:green">include</span> |
-| Guided Backpropagation    | primary, neuron | <span style="color:red">leave out</span> |
-| Guided GradCAM  | primary | <span style="color:red">leave out</span> |
-| Deconvolution | primary, neuron | <span style="color:yellow">later</span> |
-| Feature Ablation  | primary, layer, neuron  | <span style="color:green">include</span> |
-| Occlusion | primary  | <span style="color:red">leave out</span> |
-| Feature Permutation | primary | <span style="color:green">include</span> |
-| Shapley Value Sampling  | primary | <span style="color:red">leave out</span> |
-| Lime  | primary | <span style="color:red">leave out</span> |
-| KernelShap  | primary | <span style="color:red">leave out</span> |
-| Layer Relevance Propagation | primary, layer  | <span style="color:red">leave out</span> | 
-| Conductance | layer, neuron | <span style="color:yellow">later</span> |
-| Layer Activation  | layer | <span style="color:yellow">later</span> |
-| Internal Influence  | layer | <span style="color:red">leave out</span> |
-| GradCAM | layer | <span style="color:green">include</span> |
-| Neuron Gradient | neuron  | <span style="color:yellow">later</span> |
+| Integrated Gradients  |    primary, layer, neuron  | <span style="color:green">1</span> |
+| Saliency  | primary | <span style="color:green">1</span> |
+| DeepLift  | primary, layer, neuron  | <span style="color:green">1</span> |
+| DeepLiftShap  | primary, layer, neuron  | <span style="color:red">3</span> |
+| GradientShap  | primary, layer, neuron  | <span style="color:yellow">2</span> |
+| Input X Gradient  | primary | <span style="color:green">1</span> |
+| Gradient X Activation | layer | <span style="color:green">1</span> |
+| Guided Backpropagation    | primary, neuron | <span style="color:red">3</span> |
+| Guided GradCAM  | primary | <span style="color:red">3</span> |
+| Deconvolution | primary, neuron | <span style="color:yellow">2</span> |
+| Feature Ablation  | primary, layer, neuron  | <span style="color:green">1</span> |
+| Occlusion | primary  | <span style="color:red">3</span> |
+| Feature Permutation | primary | <span style="color:green">1</span> |
+| Shapley Value Sampling  | primary | <span style="color:red">3</span> |
+| Lime  | primary | <span style="color:red">3</span> |
+| KernelShap  | primary | <span style="color:red">3</span> |
+| Layer Relevance Propagation | primary, layer  | <span style="color:red">3</span> | 
+| Conductance | layer, neuron | <span style="color:yellow">2</span> |
+| Layer Activation  | layer | <span style="color:yellow">2</span> |
+| Internal Influence  | layer | <span style="color:red">3</span> |
+| GradCAM | layer | <span style="color:green">1</span> |
+| Neuron Gradient | neuron  | <span style="color:yellow">2</span> |
 | **tf-keras-vis** |||	
-| Activation Maximization | feature visualization | <span style="color:green">include</span> |
-| Vanilla Saliency / SmoothGrad | attribution | <span style="color:green">include</span> |
-| GradCAM | attribution | <span style="color:green">include</span> |
-| GradCAM++ | attribution | <span style="color:yellow">later</span> |
-| ScoreCAM  | attribution | <span style="color:yellow">later</span> |
-| LayerCAM  | attribution | <span style="color:yellow">later</span> |
+| Activation Maximization | feature visualization | <span style="color:green">1</span> |
+| Vanilla Saliency / SmoothGrad | attribution | <span style="color:green">1</span> |
+| GradCAM | attribution | <span style="color:green">1</span> |
+| GradCAM++ | attribution | <span style="color:yellow">2</span> |
+| ScoreCAM  | attribution | <span style="color:yellow">2</span> |
+| LayerCAM  | attribution | <span style="color:yellow">2</span> |
 
-_Include_ marks methods which are important and were implemented right away. These methods have also been used for
-the [evaluation](#evaluation) Methods marked as _later_ are considered to be useful, but not essential to the project.
-Those methods are implemented as well, but not part of the evaluation.
-_Leave out_ is used for methods which are deemed not important for this project and thusly are not integrated into the
+_Priority 1_ marks methods which are important and were implemented right away. These methods have also been used for
+the [evaluation](#evaluation). Methods marked as _priority 2_ are considered to be useful, but not essential to the
+project. Those methods are implemented as well, but are not part of the evaluation.
+_Priority 3_ is used for methods which are deemed not important to this project and thusly are not integrated into the
 tool.
 
 The aim of this selection is to capture a wide range of different approaches, for instance including both gradient-based
 and perturbation-based methods. This also means that of similar method pairs like Feature Ablation and Occlusion,
 usually only one method is included. Basic, often-used methods are given an advantage compared to more specialized ones
 as well. For this reson, GradCAM for example has a higher priority than the GradCAM variants. Additionally, methods
-which are known to fail sanity checks (todo cite) such as Guided Backpropagation have been excluded.
+which are known to fail sanity checks ([Adebayo et al., 2018](#adebayo2018); [Sixt et al., 2020](#sixt2020)) such as
+Guided Backpropagation have been excluded.
 
 # Cross-Framework Introspection
 
 To accomplish the task of making the selected methods from Captum accessible in TensorFlow and the tf-keras-vis methods
-accessible in PyTorch we need a tool that has the following features:
+accessible in PyTorch, our tool MetaNNvis has to have the following features:
 
-- **Model translation from PyTorch to TensorFlow:** todo: add paragraphs
-- **Model translation from TensorFlow to PyTorch**
-- **Data Translation**
-- **Interface for accessing introspection methods**
+- **Model translation between PyTorch and TensorFlow**: The tool's most crucial component is the ability to transform a
+  PyTorch model into a TensorFlow model and vice versa. The translated model should behave equivalent or at least very
+  similar to the original model, i.e., yield the same results for the same inputs. This way, we can assume that any
+  introspection results we get for the translated model are also true for the original model.
+- **Data Translation**: Many introspection methods require not only a model, but also additional data, e.g., an input
+  image for which to compute the saliency. Since users typically have model input data available in a format that
+  matches their model's framework, but the the framework of the translated model, input data needs to be transformed as
+  well.
+- **Interface for accessing introspection methods**: Finally, the tool has to pass the translated model and input data
+  to the introspection method itself and return the results. This also includes passing additional parameters for
+  finetuning the introspection method.
 
 Beside these strictly neccessary features, there are a few additionally requirements for the tool:
 
-- **Extendability**
-- **Uniform interface**
-- **Error handling**
-- **Plotting of results**
+- **Extendability**: Since we decided to cover only a limited number of methods from two toolsets, it might become
+  necessary to add new methods later on. Therefore, MetaNNvis should have a design which allows adding not only more
+  tf-keras-vis and Captum methods, but also new toolsets or even complete frameworks.
+- **Uniform interface**: Different toolsets and frameworks always have a differently structured API. When working with
+  methods from different toolsets simultaneously, this can become cumbersome. To improve the user experience, the tool
+  should provide a single interface for all toolsets that hides most of the differences.
+- **Error handling**: Errors which may occur during any part of the process, for instance during model translation or
+  calling the introspection method itself, should be avoided or at least propagated where possible.
+- **Plotting of results**: The results of introspection methods are typically multi-dimensional arrays which need to be
+  visualised to be human-understandable. This is a task which can be provided by tool as well.
 
 To achieve these goals, we have decided on the structure shown in [Figure 2](#figure2).
 
@@ -176,7 +197,7 @@ introspection methods. Instead of a regular TensorFlow model, onnx-tensorflow re
 incorporates basic functions of a TensorFlow model, but not the full functionality required by Captum methods. Another
 candidate for the ONNX to TensorFlow conversion was the [onnx2keras](https://github.com/gmalivenko/onnx2keras) library
 developed by Grigory Malivenko. It got rejected because it was incompatible with the ONNX models produced by torch.onnx.
-I In particular, layer names which include certain special character, such as `onnx::Relu_10/`, could neither be handled
+In particular, layer names which include certain special character, such as `onnx::Relu_10/`, could neither be handled
 by this onnx2keras library, nor efficiently changed beforehand.
 
 For the translation process from Tensorflow to PyTorch, we employ **[
@@ -195,11 +216,6 @@ model from an incongruous framework, i.e., a user executes a method call like th
 
 Note that the user specifically requests a tf-keras-vis method, but gives the tool a PyTorch model. How this or similar
 calls are handled is described in [Figure 3](#fig:activity_diagram).
-
-todo: update figure
-
-- in header: visualize_features()
-- determine model framework: exception if no framework matches
 
 First, all methods matching the provided `method_key` have to be retrieved. This is either done via one of the toolset
 classes or, if the `toolset` parameter is not provided, methods from all toolset classes are taken into account. If no
@@ -232,25 +248,28 @@ a plot of the results is created as well.
 </div>
 </div>
 
-<div style="display:none">
-notes:
-- goals
-- tool implementation (component / activity diagram?)
-- relevant projects: onnx (torch.onnx, tf-onnx), onnx2keras, onnx2torch, tf-keras-vis, Captum
-- refer to documentation for implementation details / usage
-eval:
-- clever hans results
-- activation maximization
-- framework comparison
-- tool limitations
-</div>
+Instructions on how to install and use MetaNNvis can be found in the [User Guide](/user_guide.ipynb). It also contains
+information on how to extend the tool with your own introspection methods.
 
 # Evaluation
+
+We have conducted tests to verify that the model translation works as intended, i.e., that for different models and
+inputs, the outputs of models and their translations only differ by a neglible amount several orders of magnitude lower
+than the output. This difference can be attributed to numerical errors during the translation process. From the strong
+similarity of the outputs, we can conclude that introspection results for one model are applicable to the other model as
+well.
+
+Furthermore, we evaluated whether the method yield expectable results for a simple clever hans predictor (
+see [Clever Hans](#clever-hans)) and compared the Saliency and Grad-CAM implementations of Captum and tf-keras-vis (
+see [Comparison](#comparison-between-toolsets)).
+
+Additional visualisations of our results can be found in the projects [results folder](../results/). #todo clean up
+results
 
 ## Clever Hans
 
 In order to evaluate if the results gained from executing an introspection method on a translated model actually yield
-useful insights into the original model, we trained a CNN model (todo: link) on a modified MNIST
+useful insights into the original model, we trained a CNN model on a modified MNIST
 dataset ([LeCun et. al., 1998](#lecun1998)) with permutated labels and 5x5 grey squares in the top left corner, their
 lightness correlating with the newly assigned label. This way, we can safely assume that the model only learns to use
 the top left corner when making a prediction.
@@ -259,7 +278,7 @@ We then used the trained model to test different attribution methods. For the Ca
 implemented and trained in TensorFlow and for the tf-keras-vis methods in PyTorch.
 
 The results for the primary attribution methods can be seen in [Figure 4](#fig:clever_hans). As can be seen, most
-methods indicate a strong focus of the network of the top left corner. (todo: why not tf-keras-vis gradcam?)
+methods indicate a strong focus of the network of the top left corner.
 [Figure 5](#fig:clever_hans_layer) shows the results of layer attribution methods for the first convolutional layer.
 Here, out of 20 channels, some are only react to the to top left corner (such as channels 16 and 18) while some show a
 random behaviour (like channel 19) or no activation at all.
@@ -345,10 +364,12 @@ todo
 
 # Bibliography
 
-- <div id="olah2017"><a href="https://distill.pub/2017/feature-visualization/">Chris Olah, Alexander Mordvintsev, Ludwig Schubert: Feature Visualization, Distill, 2017</a></div>
-- <div id="sundararajan2017"><a href="https://arxiv.org/abs/1703.01365">Mukund Sundararajan, Ankur Taly, Qiqi Yan: Axiomatic Attribution for Deep Networks, arXiv, 2017</a></div>
-- <div id="narine2020"><a href="https://arxiv.org/abs/2009.07896">Kokhlikyan et al.: Captum: A Unified and Generic Model Interpretability Library for PyTorch, arXiv, 2020</a></div>
-- <div id="lecun1998"><a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Yann LeCun et al.: Gradient-based Learning Applied to Document Recognition, IEEE, 1998</a></div>
-- <div id="simonyan2013"><a href="https://arxiv.org/abs/1312.6034">Karen Simonyan, Andrea Vedaldi, Andrew Zisserma: Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps, arXiv, 2013</a></div>
-- <div id="selvaraju2017"><a href="https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html">Ramprasaath R. Selvaraju et. al.: Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization, Proceedings
-  of the IEEE International Conference on Computer Vision (ICCV), 2017</a></div>
+- <div id="adebayo2018">Julius Adebayo et al.: <a href="https://proceedings.neurips.cc/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html">Sanity Checks for Saliency Maps</a>, Advances in Neural Information Processing Systems, 2018</div>
+- <div id="kokhlikyan2020">Kokhlikyan et al.: <a href="https://arxiv.org/abs/2009.07896">Captum: A Unified and Generic Model Interpretability Library for PyTorch</a>, arXiv, 2020</div>
+- <div id="lecun1998">Yann LeCun et al.: <a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Gradient-based Learning Applied to Document Recognition</a>, IEEE, 1998</div>
+- <div id="olah2017">Chris Olah, Alexander Mordvintsev, Ludwig Schubert: <a href="https://distill.pub/2017/feature-visualization/">Feature Visualization</a>, Distill, 2017</div>
+- <div id="selvaraju2017">Ramprasaath R. Selvaraju et. al.: <a href="https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html">Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization</a>, Proceedings
+  of the IEEE International Conference on Computer Vision (ICCV), 2017</div>
+- <div id="sixt2020">Leon Sixt, Maximilian Granz, Tim Landgraf: <a href="https://proceedings.mlr.press/v119/sixt20a.html">When Explanations Lie: Why Many Modified BP Attributions Fail</a>, Proceedings of the 37th International Conference on Machine Learning, 2020</div>
+- <div id="simonyan2013">Karen Simonyan, Andrea Vedaldi, Andrew Zisserma: <a href="https://arxiv.org/abs/1312.6034">Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps</a>, arXiv, 2013</div>
+- <div id="sundararajan2017">Mukund Sundararajan, Ankur Taly, Qiqi Yan: <a href="http://proceedings.mlr.press/v70/sundararajan17a.html">Axiomatic Attribution for Deep Networks</a>, Proceedings of the 34th International Conference on Machine Learning, 2017</div>
