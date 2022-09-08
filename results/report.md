@@ -1,8 +1,6 @@
 Blog Report Cross-Framework-Introspection
 ---
 
-todo: toolname -> MetaNNvis
-
 # Introduction
 
 Over the last years, neural networks have grown ever more powerful and complex. Their structure allows them to be
