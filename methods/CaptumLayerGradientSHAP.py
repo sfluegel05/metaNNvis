@@ -4,7 +4,7 @@ from methods.AbstractAttributionMethod import AbstractAttributionMethod
 from methods.method_keys import LAYER_GRADIENT_SHAP
 
 
-class CaptumLayerGradienSHAP(AbstractAttributionMethod):
+class CaptumLayerGradientSHAP(AbstractAttributionMethod):
 
     @staticmethod
     def get_method_key():

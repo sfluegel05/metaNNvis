@@ -1,5 +1,5 @@
 from frameworks.PyTorchFramework import PyTorchFramework
-from methods import CaptumLayerGradientSHAP
+from methods.CaptumLayerGradientSHAP import CaptumLayerGradientSHAP
 from methods.CaptumLayerConductance import CaptumLayerConductance
 from methods.CaptumLayerDeepLift import CaptumLayerDeepLift
 from methods.CaptumLayerFeatureAblation import CaptumLayerFeatureAblation
