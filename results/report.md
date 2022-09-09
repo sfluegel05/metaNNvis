@@ -3,7 +3,7 @@ Blog Report Cross-Framework-Introspection
 
 # Introduction
 
-Over the last years, neural networks have grown ever more powerful and complex. Their structure allows them to be
+Over the last years, neural networks (NNs) have grown ever more powerful and complex. Their structure allows them to be
 adapted for a wide range of tasks in which the can provide great results.
 
 One of their caveats however is the limited insight into how these results emerge. For most human users, the inside of a
@@ -17,8 +17,7 @@ the results to draw the right conclusions.
 Different algorithms, called introspection methods, have been developed to counteract this problem. They try to explain
 and visualise a networks's behaviour either by attributing the results to certain parts of either the input or of the
 network itself or alternatively by visualising features a network has learned. An example for attribution is the
-Grad-CAM method which allows to visualise the contribution of different parts in the input toward a classification (
-see [Figure 1a](#figure1a)). Feature visualization on the other hand can be achieved by optimizing a randomized input
+Grad-CAM method which allows to visualise the contribution of different parts in the input toward a classification (see [Figure 1a](#figure1a)). Feature visualization on the other hand can be achieved by optimizing a randomized input
 towards a certain goal such as activating a particular neuron (see [Figure 1b](#figure1b)).
 
 
@@ -36,7 +35,7 @@ towards a certain goal such as activating a particular neuron (see [Figure 1b](#
 For users' convenience, implementations of many of these methods have been packaged and made publicly available in
 toolsets like [Captum](https://captum.ai/) or [tf-keras-vis](https://github.com/keisen/tf-keras-vis). These libraries
 save users the effort of implementing all methods by themselves and make it easy to switch between and compare different
-methods. One limitation of these preimplemented introspection methods however is that they are bould to a specific model
+methods. One limitation of these preimplemented introspection toolsets however is that they are bould to a specific model
 framework, e.g. [PyTorch](https://pytorch.org/) or [TensorFlow](https://www.tensorflow.org/).
 
 In practice, this may lead to situations like the following:
@@ -55,13 +54,12 @@ their favoured introspection method. Based on that, the tool selects an implemen
 model does not fit the implementation's framework, it translates the model and additional arguments into the right
 framework. Finally, it executes the introspection method and returns the result.
 
-Concretely, the tool supports methods from tf-keras-vis and Captum, but has also been designed to be extendable to other
+Currently, the tool supports methods from tf-keras-vis and Captum, but has also been designed to be extendable to other
 toolsets if needed.
 
-In the following, we will first describe the supported introspection toolsets. Afterwards, we will describe the tool's
+In the following, we will first introduce the supported introspection toolsets. Afterwards, we will describe the tool's
 features and functionality in more detail (Section [MetaNNvis Implementation](#metannvis-implementation)). Finally, we
-will evaluate the tool and use it to compare different implementations of the same introspection methods (
-Section [Evaluation](#evaluation)).
+will evaluate the tool and use it to compare different implementations of the same introspection methods (Section [Evaluation](#evaluation)).
 
 # Supported Toolsets
 
@@ -69,7 +67,7 @@ The goal of this project is to connect models and introspection methods from dif
 more precisely Tensorflow 2.0, and PyTorch are currently the most used machine learning frameworks, the interaction
 between models and methods from these two frameworks is the most interesting application for our approach. Therefore, we
 have chosen one toolset from each framework, Captum from PyTorch and tf-keras-vis from TensorFlow. We will take a closer
-look at them in the following:
+look at them in the following.
 
 ## Captum
 
@@ -158,7 +156,7 @@ accessible in PyTorch, MetaNNvis has to have the following features:
   to the introspection method itself and return the results. This also includes passing additional parameters for
   finetuning the introspection method.
 
-Beside these strictly neccessary features, there are a few additionally requirements for the tool:
+Beside these strictly neccessary features, there are a few additional requirements for the tool:
 
 - **Extendability**: Since we decided to cover only a limited number of methods from two toolsets, it might become
   necessary to add new methods later on. Therefore, MetaNNvis should have a design which allows adding not only more
@@ -169,7 +167,7 @@ Beside these strictly neccessary features, there are a few additionally requirem
 - **Error handling**: Errors which may occur during any part of the process, for instance during model translation or
   calling the introspection method itself, should be avoided or at least propagated where possible.
 - **Plotting of results**: The results of introspection methods are typically multi-dimensional arrays which need to be
-  visualised to be human-understandable. This is a task which can be provided by tool as well.
+  visualised to be human-understandable. This is a task which can be provided by the tool as well.
 
 ## Components
 
@@ -177,13 +175,13 @@ To achieve these goals, we have decided on the structure shown in [Figure 2](#fi
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="figure2" src="report_images/cfi_components_09-08-22.png" alt="Figure 2: Internal and external components of the cross-framework introspection tool." width=100%/>
+<img id="figure2" src="report_images/cfi_components_09-08-22.PNG" alt="Figure 2: Internal and external components of the cross-framework introspection tool." width=100%/>
 <div text-align=center class="caption">Figure 2: Internal and external components of MetaNNvis.</div>
 </div>
 </div>
 
 First, let's take a look at the external components shown on the lefthand side. These are required as part of the
-translation process. Models are translated between PyTorch and TensorFlow via an indermediate representation,
+translation process. Models are translated between PyTorch and TensorFlow via an intermediate representation,
 the [Open Neural Network Exchange](https://onnx.ai/) (ONNX) format. ONNX has been developed specifically to be
 interoperable with a wide range of different frameworks including PyTorch and TensorFlow. Another advantage are the
 already existing libraries for conversion of models between ONNX and other frameworks, four of which are used here:
@@ -195,8 +193,8 @@ the translation process, we are using a [forked version](https://github.com/sflu
 onnx2keras.
 
 This choice differs from the original project plan to use the [onnx-tensorflow](https://github.com/onnx/onnx-tensorflow)
-library provided by ONNX. However, it turned out that the output of onnx-tensorflow is not compatible with the
-introspection methods. Instead of a regular TensorFlow model, onnx-tensorflow returns a `SavedModel` instance which can
+library provided by ONNX because it turned out that the output of onnx-tensorflow is not compatible with the
+introspection methods. Instead of a regular TensorFlow model, onnx-tensorflow returns a `SavedModel` instance which
 incorporates basic functions of a TensorFlow model, but not the full functionality required by Captum methods. Another
 candidate for the ONNX to TensorFlow conversion was the [onnx2keras](https://github.com/gmalivenko/onnx2keras) library
 developed by Grigory Malivenko. It got rejected because it was incompatible with the ONNX models produced by torch.onnx.
@@ -261,19 +259,17 @@ information on how to extend the tool with your own introspection methods.
 
 We have conducted tests to verify that the model translation works as intended, i.e., that for different models and
 inputs, the outputs of models and their translations only differ by an amount which is several orders of magnitude lower
-than the output and thus neglegible. This difference can be attributed to numerical errors during the translation
+than the output and thus negligible. This difference can be attributed to numerical errors during the translation
 process. From the strong similarity of the outputs, we can conclude that introspection results for one model are
 applicable to the other model as well.
 
-Furthermore, we evaluated whether the method yield expectable results for a simple clever hans predictor (
-see [Clever Hans](#clever-hans)) and compared the Saliency and Grad-CAM implementations of Captum and tf-keras-vis (
-see [Comparison](#comparison-between-toolsets)).
+Furthermore, we evaluated whether the method yield expectable results for a simple clever hans predictor (see [Clever Hans](#clever-hans)) and compared the Saliency and Grad-CAM implementations of Captum and tf-keras-vis (see [Comparison](#comparison-between-toolsets)).
 
 Additional visualisations of our results can be found in the projects [results folder](../results/).
 
 ## Clever Hans
 
-In order to evaluate if the results gained from executing an introspection method on a translated model actually yield
+In order to evaluate if the results gained from executing an introspection method on a translated model actually yields
 useful insights into the original model, we trained a CNN model on a modified MNIST
 dataset ([LeCun et. al., 1998](#lecun1998)) with permutated labels and 5x5 grey squares in the top left corner, their
 brightness correlating with the newly assigned label. This way, we can safely assume that the model only learns to use
@@ -318,13 +314,13 @@ Tensorflow, since these methods are implemented in both toolsets.
 ### Saliency
 
 Saliency Maps ([Simonyan, 2013](#simonyan2013)) are a basic visualization method for neural networks which use the
-gradient of the class score with regard to the input image.
+gradient of the class score with respect to the input image.
 
 For our purposes, we trained both a TensorFlow and a PyTorch model on the MNIST dataset and applied the Saliency
 implementations of Captum and tf-keras-vis to them.
 [Figure 6](#fig:comparison_saliency) shows the results for one input image. For both models, the results from Captum and
 tf-keras-vis are nearly equal when additional parameters are used (see last row, columns 1 and 3). The additional
-parameters have been deliberately in a way that results in similary results for both implementation. The remaining
+parameters have been chosen deliberately in a way that results in similar results for both implementations. The remaining
 difference, which is several orders of magnitude lower than the method output, can be attributed to minor numerical
 differences resulting from the model translation process. If the default parameters are used, the difference between the
 Captum and tf-keras-vis results is significantly larger (see columns 2 and 4). This happens because tf-keras-vis has
@@ -354,7 +350,7 @@ original paper describing GradCAM.
 
 The scaling of images to the original input size is a common feature for GradCAM implementations since it allows to
 superimpose a heatmap directly on input images. However, Captum and tf-keras-vis implement this differently:
-Tf-keras-vis uses an `expand_cam` flag that is `True` by default and interpolates the images. Captum has an additional
+tf-keras-vis uses an `expand_cam` flag that is `True` by default and interpolates the images. Captum has an additional
 method that can be applied to the GradCAM output and upsamples the output the the desired size, but applies no
 interpolation.
 
