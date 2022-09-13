@@ -60,7 +60,7 @@ In the following, we will first introduce the supported introspection toolsets. 
 features and functionality in more detail (Section [MetaNNvis Implementation](#metannvis-implementation)). Finally, we
 will evaluate the tool and use it to compare different implementations of the same introspection methods (Section [Evaluation](#evaluation)).
 
-# Supported Toolsets
+# Supported Introspection Techniques
 
 The goal of this project is to connect models and introspection methods from different frameworks. Since TensorFlow,
 more precisely Tensorflow 2.x, and PyTorch are currently the most used machine learning frameworks, the interaction
@@ -75,7 +75,7 @@ implementations of various attribution methods, which it divides into primary, l
 methods are measuring the importance of either the input, a model layer or a particular neuron. Additionality, Captum
 provides evaluation metrics and a visualisation tool for these methods. The library can be applied to different
 NN-tasks, including classification and non-classification models as well as different input modalities. Captum is
-open-source and built to be extensible by new algorithms.
+open-source and built to be extendable by new algorithms.
 
 ## tf-keras-vis
 
@@ -90,38 +90,170 @@ Especially Captum implements a large number of methods: 36 in total, counting pr
 seperately. In order to limit the scope of this project, we have chosen prioritise the introspection methods provided by
 Captum and tf-keras-vis. The result can be seen in the table below.
 
-| Method  | Category  | Priority  |
-| --- | --- | --- |
-| **Captum** |||
-| Integrated Gradients  |    primary, layer, neuron  | <span style="color:green">1</span> |
-| Saliency  | primary | <span style="color:green">1</span> |
-| DeepLift  | primary, layer, neuron  | <span style="color:green">1</span> |
-| DeepLiftShap  | primary, layer, neuron  | <span style="color:red">3</span> |
-| GradientShap  | primary, layer, neuron  | <span style="color:yellow">2</span> |
-| Input X Gradient  | primary | <span style="color:green">1</span> |
-| Gradient X Activation | layer | <span style="color:green">1</span> |
-| Guided Backpropagation    | primary, neuron | <span style="color:red">3</span> |
-| Guided GradCAM  | primary | <span style="color:red">3</span> |
-| Deconvolution | primary, neuron | <span style="color:yellow">2</span> |
-| Feature Ablation  | primary, layer, neuron  | <span style="color:green">1</span> |
-| Occlusion | primary  | <span style="color:red">3</span> |
-| Feature Permutation | primary | <span style="color:green">1</span> |
-| Shapley Value Sampling  | primary | <span style="color:red">3</span> |
-| Lime  | primary | <span style="color:red">3</span> |
-| KernelShap  | primary | <span style="color:red">3</span> |
-| Layer Relevance Propagation | primary, layer  | <span style="color:red">3</span> | 
-| Conductance | layer, neuron | <span style="color:yellow">2</span> |
-| Layer Activation  | layer | <span style="color:yellow">2</span> |
-| Internal Influence  | layer | <span style="color:red">3</span> |
-| GradCAM | layer | <span style="color:green">1</span> |
-| Neuron Gradient | neuron  | <span style="color:yellow">2</span> |
-| **tf-keras-vis** |||	
-| Activation Maximization | feature visualization | <span style="color:green">1</span> |
-| Vanilla Saliency / SmoothGrad | attribution | <span style="color:green">1</span> |
-| GradCAM | attribution | <span style="color:green">1</span> |
-| GradCAM++ | attribution | <span style="color:yellow">2</span> |
-| ScoreCAM  | attribution | <span style="color:yellow">2</span> |
-| LayerCAM  | attribution | <span style="color:yellow">2</span> |
+<style>
+.toolset-header {
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  text-align: center;
+}
+td:nth-child(3) {
+  text-align: center;
+}
+</style>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Category</th>
+        <th>Priority</th>
+    </tr>
+    <tr>
+        <th class="toolset-header" colspan=3>Captum</th>
+    </tr>
+    <tr>
+        <td>Integrated Gradients</td>
+        <td>primary, layer, neuron</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Saliency</td>
+        <td>primary</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>DeepLift</td>
+        <td>primary, layer, neuron</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>DeepLiftShap</td>
+        <td>primary, layer, neuron</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>GradientShap</td>
+        <td>primary, layer, neuron</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>Input X Gradient</td>
+        <td>primary</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Gradient X Activation</td>
+        <td>layer</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Guided Backpropagation</td>
+        <td>primary, neuron</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Guided GradCAM</td>
+        <td>primary</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Deconvolution</td>
+        <td>primary, neuron</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>Feature Ablation</td>
+        <td>primary, layer, neuron</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Occlusion</td>
+        <td>primary</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Feature Permutation</td>
+        <td>primary</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Shapley Value Sampling</td>
+        <td>primary</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Lime</td>
+        <td>primary</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>KernelShap</td>
+        <td>primary</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Layer Relevance Propagation</td>
+        <td>primary, layer</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>Conductance</td>
+        <td>layer, neuron</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>Layer Activation</td>
+        <td>layer</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>Internal Influence</td>
+        <td>layer</td>
+        <td><span style="color:red">3</span></td>
+    </tr>
+    <tr>
+        <td>GradCAM</td>
+        <td>layer</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Neuron Gradient</td>
+        <td>neuron</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <th class="toolset-header" colspan=3>tf-keras-vis</th>
+    </tr>
+    <tr>
+        <td>Activation Maximization</td>
+        <td>feature visualization</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>Vanilla Saliency / SmoothGrad</td>
+        <td>attribution</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>GradCAM</td>
+        <td>attribution</td>
+        <td><span style="color:green">1</span></td>
+    </tr>
+    <tr>
+        <td>GradCAM++</td>
+        <td>attribution</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>ScoreCAM</td>
+        <td>attribution</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+    <tr>
+        <td>LayerCAM</td>
+        <td>attribution</td>
+        <td><span style="color:yellow">2</span></td>
+    </tr>
+</table>
 
 _Priority 1_ marks methods which are important and were implemented right away. These methods have also been used for
 the [evaluation](#evaluation). Methods marked as _priority 2_ are considered to be useful, but not essential to the
@@ -206,7 +338,7 @@ onnx2torch](https://pypi.org/project/onnx2torch/)**, which has been developed by
 mentioned libraries are accessible open-source.
 
 Regarding the internal structure, note that the translation classes, as well as methods and toolsets have abstract
-superclasses which provide an interface to the other functions. This ensures the tool's extensibility, since new
+superclasses which provide an interface to the other functions. This ensures the tool's extendability, since new
 methods, toolsets or even complete frameworks can be added as new subclasses with minimal additional effort.
 
 ## Workflow
