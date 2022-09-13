@@ -50,15 +50,35 @@ class TestCleverHans(unittest.TestCase):
                 seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
                                 center=0, xticklabels=5, yticklabels=5, square=True,
                                 cbar_kws={'shrink': 0.8, 'pad': 0.05})
-                plt.savefig('clever_hans_results_captum.png')
+        plt.savefig('clever_hans_results_captum.png', bbox_inches='tight')
         plt.show()
 
     def test_captum_gradcam(self):
         n_samples = 8
-        attr = perform_attribution(self.tf_net, method_keys.GRAD_CAM, plot=True, toolset=toolset_keys.CAPTUM,
+        counter = 1
+        figure = plt.figure(figsize=(5 * n_samples, 10))
+
+        for i in range(n_samples):
+            figure.add_subplot(2, n_samples, counter)
+            counter += 1
+            plt.title(f'Label: {self.y_test[i]}')
+            plt.imshow(self.x_test[i], cmap="gray")
+
+        attr = perform_attribution(self.tf_net, method_keys.GRAD_CAM, plot=False, toolset=toolset_keys.CAPTUM,
                                    init_args={'layer': 'Conv_1'},
                                    exec_args={'inputs': self.x_test[:n_samples], 'target': self.y_test[:n_samples],
                                               'relu_attributions': True})
+        for i in range(n_samples):
+            figure.add_subplot(2, n_samples, counter)
+            counter += 1
+
+            plt.title(f'Captum Grad-CAM')
+            seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
+                            center=0, xticklabels=5, yticklabels=5, square=True,
+                            cbar_kws={'shrink': 0.76, 'pad': 0.05})
+        plt.savefig('clever_hans_captum_gradcam.png', bbox_inches='tight')
+
+    plt.show()
 
     def test_captum_layers(self):
         n_samples = 8
@@ -119,7 +139,7 @@ class TestCleverHans(unittest.TestCase):
                 seaborn.heatmap(attr[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
                                 center=0, xticklabels=5, yticklabels=5, square=True,
                                 cbar_kws={'shrink': 0.76, 'pad': 0.05})
-        plt.savefig('clever_hans_results_tfkerasvis.png')
+        plt.savefig('clever_hans_results_tfkerasvis.png', bbox_inches='tight')
         plt.show()
 
 

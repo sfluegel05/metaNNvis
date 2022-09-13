@@ -17,8 +17,9 @@ the results to draw the right conclusions.
 Different algorithms, called introspection methods, have been developed to counteract this problem. They try to explain
 and visualise a networks's behaviour either by attributing the results to certain parts of either the input or of the
 network itself or alternatively by visualising features a network has learned. An example for attribution is the
-Grad-CAM method which allows to visualise the contribution of different parts in the input toward a classification (see [Figure 1a](#figure1a)). Feature visualization on the other hand can be achieved by optimizing a randomized input
-towards a certain goal such as activating a particular neuron (see [Figure 1b](#figure1b)).
+Grad-CAM method which allows to visualise the contribution of different parts in the input toward a classification (
+see [Figure 1a](#figure1a)). Feature visualisation on the other hand can be achieved by optimising an input towards a
+certain goal such as activating a particular neuron (see [Figure 1b](#figure1b)).
 
 
 <div class="row" style="display: flex">
@@ -27,27 +28,25 @@ towards a certain goal such as activating a particular neuron (see [Figure 1b](#
 <div text-align=center class="caption">Figure 1a: Grad-CAM for the classes 'cat' and 'dog'. Source: <a href="#selvaraju2017">Selvaraju et al., 2017</a></div>
 </div>
 <div class="column" style="padding: 10px;">
-<img id="figure1b" src="report_images/feature_vis_example.png" alt="Feature Visualization for a single neuron using existing images (top) and optimization." height=74%/>
-<div text-align=center class="caption">Figure 1b: Feature Visualization for a single neuron using existing images (top) and optimization. Source: <a href="#olah2017">(Olah et al., 2017)</a></div>
+<img id="figure1b" src="report_images/feature_vis_example.png" alt="Feature Visualisation for a single neuron using existing images (top) and optimisation." height=74%/>
+<div text-align=center class="caption">Figure 1b: Feature Visualisation for a single neuron using existing images (top) and optimisation. Source: <a href="#olah2017">(Olah et al., 2017)</a></div>
 </div>
 </div>
 
 For users' convenience, implementations of many of these methods have been packaged and made publicly available in
 toolsets like [Captum](https://captum.ai/) or [tf-keras-vis](https://github.com/keisen/tf-keras-vis). These libraries
 save users the effort of implementing all methods by themselves and make it easy to switch between and compare different
-methods. One limitation of these preimplemented introspection toolsets however is that they are bould to a specific model
-framework, e.g. [PyTorch](https://pytorch.org/) or [TensorFlow](https://www.tensorflow.org/).
+methods. One limitation of these preimplemented introspection toolsets however is that they are bould to a specific
+model framework, e.g. [PyTorch](https://pytorch.org/) or [TensorFlow](https://www.tensorflow.org/).
 
 In practice, this may lead to situations like the following:
 Imagine you have trained a model in TensorFlow and now want to apply the attribution method Integrated
 Gradients [(Sudararajan, 2017)](#sundararajan2017) to it. You find out that this particular method is already
-implemented in Captum, a PyTorch toolset, but not in the TensorFlow toolset tf-keras-vis. This means you have three
-options: Rebuild your model in PyTorch so you can use the PyTorch toolset, implement the method yourself or don't use
-the method at all.
+implemented in Captum, a PyTorch toolset, but not in the TensorFlow toolset tf-keras-vis. This means that the only way
+to use your desired method is to transform your TensorFlow model into an equivalent PyTorch model.
 
-None of these options is optimal. It would be more convenient and efficient to re-use the already existing Integrated
-Gradients implementation while keeping the TensorFlow model. For bridging the gap between model and introspection
-method, we have developed the tool **MetaNNvis**.
+Since performing this manually requires a lot of effort, we have build a tool, called **MetaNNvis**, that automates this
+process.
 
 MetaNNvis acts as an interface between the user and the introspection methods. The user just puts in their model and
 their favoured introspection method. Based on that, the tool selects an implementation, and, if the framework of the
@@ -64,9 +63,9 @@ will evaluate the tool and use it to compare different implementations of the sa
 # Supported Toolsets
 
 The goal of this project is to connect models and introspection methods from different frameworks. Since TensorFlow,
-more precisely Tensorflow 2.0, and PyTorch are currently the most used machine learning frameworks, the interaction
+more precisely Tensorflow 2.x, and PyTorch are currently the most used machine learning frameworks, the interaction
 between models and methods from these two frameworks is the most interesting application for our approach. Therefore, we
-have chosen one toolset from each framework, Captum from PyTorch and tf-keras-vis from TensorFlow. We will take a closer
+have chosen one toolset for each framework, Captum from PyTorch and tf-keras-vis from TensorFlow. We will take a closer
 look at them in the following.
 
 ## Captum
@@ -81,14 +80,14 @@ open-source and built to be extensible by new algorithms.
 ## tf-keras-vis
 
 The open-source library [tf-keras-vis](https://github.com/keisen/tf-keras-vis) contains visualisation methods for
-TensorFlow 2.0 models. It supports both feature visualisation with activation maximisation as well as attribution
+TensorFlow 2.x models. It supports both feature visualisation with activation maximisation as well as attribution
 methods, more precisely saliency maps and different variants of class activation maps. tf-keras-vis has been developed
 for image inputs and has been designed to be light-weight and flexible.
 
 ## Method selection
 
 Especially Captum implements a large number of methods: 36 in total, counting primary, layer and neuron variants
-seperately. In order to limit the scope of this project, we have chosen prioritize the introspection methods provided by
+seperately. In order to limit the scope of this project, we have chosen prioritise the introspection methods provided by
 Captum and tf-keras-vis. The result can be seen in the table below.
 
 | Method  | Category  | Priority  |
@@ -132,7 +131,7 @@ tool.
 
 The aim of this selection is to capture a wide range of different approaches, for instance including both gradient-based
 and perturbation-based methods. This also means that of similar method pairs like Feature Ablation and Occlusion,
-usually only one method is included. Basic, often-used methods are given an advantage compared to more specialized ones
+usually only one method is included. Basic, often-used methods are given an advantage compared to more specialised ones
 as well. For this reson, GradCAM for example has a higher priority than the GradCAM variants. Additionally, methods
 which are known to fail sanity checks ([Adebayo et al., 2018](#adebayo2018); [Sixt et al., 2020](#sixt2020)) such as
 Guided Backpropagation have been excluded.
@@ -313,17 +312,18 @@ Tensorflow, since these methods are implemented in both toolsets.
 
 ### Saliency
 
-Saliency Maps ([Simonyan, 2013](#simonyan2013)) are a basic visualization method for neural networks which use the
+Saliency Maps ([Simonyan, 2013](#simonyan2013)) are a basic visualisation method for neural networks which use the
 gradient of the class score with respect to the input image.
 
 For our purposes, we trained both a TensorFlow and a PyTorch model on the MNIST dataset and applied the Saliency
 implementations of Captum and tf-keras-vis to them.
 [Figure 6](#fig:comparison_saliency) shows the results for one input image. For both models, the results from Captum and
 tf-keras-vis are nearly equal when additional parameters are used (see last row, columns 1 and 3). The additional
-parameters have been chosen deliberately in a way that results in similar results for both implementations. The remaining
-difference, which is several orders of magnitude lower than the method output, can be attributed to minor numerical
-differences resulting from the model translation process. If the default parameters are used, the difference between the
-Captum and tf-keras-vis results is significantly larger (see columns 2 and 4). This happens because tf-keras-vis has
+parameters have been chosen deliberately in a way that results in similar results for both implementations. The
+remaining difference, which is several orders of magnitude lower than the method output, can be attributed to minor
+numerical differences resulting from the model translation process. If the default parameters are used, the difference
+between the Captum and tf-keras-vis results is significantly larger (see columns 2 and 4). This happens because
+tf-keras-vis has
 a `normalize_map` parameter that defaults to `true`, which scales the Saliency Map to values between 0 and 1.
 
 <div class="row" style="display: flex">

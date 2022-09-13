@@ -44,7 +44,8 @@ def torch_saliency(use_additional_args=True):
                                            dummy_input=mnist_x, init_args=keras_vis_init_args,
                                            exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.size()[0]
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency', 'comparison_torch_saliency.png')
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency',
+         f'comparison_torch_saliency{"_add_args" if use_additional_args else ""}.png')
 
 
 def torch_gradcam(interpolate=False, use_additional_args=True):
@@ -74,8 +75,8 @@ def torch_gradcam(interpolate=False, use_additional_args=True):
                                            dummy_input=mnist_x,
                                            exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.size()[0]
-    file_name = 'comparison_torch_gradcam_scaled_to_original.png' if interpolate else 'comparison_torch_gradcam.png'
-    plot(mnist_x, mnist_y.tolist(), res_captum, res_tf_keras_vis, n_samples, 'GradCAM', file_name)
+    file_name = f'comparison_torch{"_add_args" if use_additional_args else ""}_gradcam{"_scaled_to_original" if interpolate else ""}.png'
+    plot(mnist_x, mnist_y.tolist(), res_captum, res_tf_keras_vis, n_samples, 'Grad-CAM', file_name)
 
 
 def tf_saliency(use_additional_args=True):
@@ -96,7 +97,7 @@ def tf_saliency(use_additional_args=True):
                                            exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.shape[0]
     plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Saliency',
-         'comparison_tf_saliency_no_model_modifier.png')
+         f'comparison_tf_saliency{"_add_args" if use_additional_args else ""}.png')
 
 
 def tf_gradcam(interpolate=False, use_additional_args=True):
@@ -128,10 +129,10 @@ def tf_gradcam(interpolate=False, use_additional_args=True):
                                            dummy_input=mnist_x[:64], init_args={},
                                            exec_args=keras_vis_exec_args)
     n_samples = 8  # mnist_x.shape[0]
-    file_name = 'comparison_tf_gradcam_scaled_to_original.png' if interpolate else 'comparison_tf_gradcam.png'
+    file_name = f'comparison_tf{"_add_args" if use_additional_args else ""}_gradcam{"_scaled_to_original" if interpolate else ""}.png'
     if not isinstance(res_tf_keras_vis, np.ndarray):
         res_tf_keras_vis = res_tf_keras_vis.numpy()
-    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'GradCAM', file_name)
+    plot(mnist_x, mnist_y, res_captum, res_tf_keras_vis, n_samples, 'Grad-CAM', file_name)
 
 
 def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, filename):
@@ -154,15 +155,18 @@ def plot(data_x, data_y, res_captum, res_tf_keras_vis, n_samples, methodname, fi
         figure.add_subplot(4, n_samples, counter + n_samples)
         plt.title(f'Captum {methodname}')
         seaborn.heatmap(res_captum[i].squeeze(), cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
-                        center=0, xticklabels=5, yticklabels=5)
+                        center=0, xticklabels=5, yticklabels=5, square=True,
+                        cbar_kws={'shrink': 0.8, 'pad': 0.05})
         figure.add_subplot(4, n_samples, counter + 2 * n_samples)
         plt.title(f'tf-keras-vis {methodname}')
         seaborn.heatmap(res_tf_keras_vis[i], cmap="coolwarm",  # vmin=-attr_total_max, vmax=attr_total_max,
-                        center=0, xticklabels=5, yticklabels=5)
+                        center=0, xticklabels=5, yticklabels=5, square=True,
+                        cbar_kws={'shrink': 0.8, 'pad': 0.05})
         figure.add_subplot(4, n_samples, counter + 3 * n_samples)
         plt.title('Captum - tf-keras-vis')
         seaborn.heatmap(res_captum[i].squeeze() - res_tf_keras_vis[i],  # vmin=-diff_total_max, vmax=diff_total_max,
-                        cmap="coolwarm", center=0, xticklabels=5, yticklabels=5)
+                        cmap="coolwarm", center=0, xticklabels=5, yticklabels=5, square=True,
+                        cbar_kws={'shrink': 0.8, 'pad': 0.05})
         # figure.add_subplot(6, n_samples, counter + 4 * n_samples)
         # plt.title('Captum / (Captum + tf-keras-vis)')
         # seaborn.heatmap(res_captum[i].squeeze() / (res_captum[i].squeeze() + res_tf_keras_vis[i]), cmap="coolwarm",
@@ -198,9 +202,13 @@ def ceil_power_of_10(x):
 if __name__ == '__main__':
     # gradcam: don't combine interpolate=False and use_additional_args=False -> without additional args, tf-keras-vis
     # interpolates by default, leading to a size-mismatch with captum
-    # tf_gradcam(interpolate=False, use_additional_args=False)
-    tf_gradcam(interpolate=True, use_additional_args=False)
-    # torch_gradcam(interpolate=False, use_additional_args=False)
+    # tf_gradcam(interpolate=False, use_additional_args=True)
+    # tf_gradcam(interpolate=True, use_additional_args=False)
+    # tf_gradcam(interpolate=True, use_additional_args=True)
+    # torch_gradcam(interpolate=False, use_additional_args=True)
     # torch_gradcam(interpolate=True, use_additional_args=False)
-    # torch_saliency(use_additional_args=False)
-    # tf_saliency(use_additional_args=False)
+    # torch_gradcam(interpolate=True, use_additional_args=True)
+    torch_saliency(use_additional_args=False)
+    torch_saliency(use_additional_args=True)
+    tf_saliency(use_additional_args=False)
+    tf_saliency(use_additional_args=True)
