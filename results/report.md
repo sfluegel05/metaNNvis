@@ -24,11 +24,12 @@ certain goal such as activating a particular neuron (see [Figure 1b](#figure1b))
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px">
-<img id="figure1a" src="report_images/gradcam_example_horizontal.png" alt="Grad-CAM for the classes 'cat' and 'dog'" height=74%/>
+<img id="figure1a" src="report_images/gradcam_example_horizontal.png" alt="Grad-CAM for the classes 'cat' and 'dog'" width= 150%/>
 <div text-align=center class="caption">Figure 1a: Grad-CAM for the classes 'cat' and 'dog'. Source: <a href="#selvaraju2017">Selvaraju et al., 2017</a></div>
 </div>
+<br>
 <div class="column" style="padding: 10px;">
-<img id="figure1b" src="report_images/feature_vis_example_horizontal.png" alt="Feature Visualisation for a single neuron using existing images (top) and optimisation." height=74%/>
+<img id="figure1b" src="report_images/feature_vis_example_horizontal.png" alt="Feature Visualisation for a single neuron using existing images (top) and optimisation." width=75%/>
 <div text-align=center class="caption">Figure 1b: Feature Visualisation for a single neuron using existing images (left) and optimisation. Source: <a href="#olah2017">Olah et al., 2017</a></div>
 </div>
 </div>
@@ -98,18 +99,6 @@ reson, GradCAM for example has a higher priority than the GradCAM variants. Addi
 fail sanity checks ([Adebayo et al., 2018](#adebayo2018); [Sixt et al., 2020](#sixt2020)) such as Guided Backpropagation
 have been excluded.The result can be seen in the table below.
 
-Todo: fix style block on github
-<style>
-.toolset-header {
-  border-top: 2px solid black;
-  border-bottom: 2px solid black;
-  text-align: center;
-}
-td:nth-child(3) {
-  text-align: center;
-}
-</style>
-
 <table>
     <tr>
         <th>Method</th>
@@ -117,150 +106,150 @@ td:nth-child(3) {
         <th>Priority</th>
     </tr>
     <tr>
-        <th class="toolset-header" colspan=3>Captum</th>
+        <th class="toolset-header" style="border-top: 2px solid; border-bottom: 2px solid; text-align: center;" colspan=3>Captum</th>
     </tr>
     <tr>
         <td>Integrated Gradients</td>
         <td>primary, layer, neuron</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Saliency</td>
         <td>primary</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>DeepLift</td>
         <td>primary, layer, neuron</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>DeepLiftShap</td>
         <td>primary, layer, neuron</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>GradientShap</td>
         <td>primary, layer, neuron</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>Input X Gradient</td>
         <td>primary</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Gradient X Activation</td>
         <td>layer</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Guided Backpropagation</td>
         <td>primary, neuron</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Guided GradCAM</td>
         <td>primary</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Deconvolution</td>
         <td>primary, neuron</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>Feature Ablation</td>
         <td>primary, layer, neuron</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Occlusion</td>
         <td>primary</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Feature Permutation</td>
         <td>primary</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Shapley Value Sampling</td>
         <td>primary</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Lime</td>
         <td>primary</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>KernelShap</td>
         <td>primary</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Layer Relevance Propagation</td>
         <td>primary, layer</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>Conductance</td>
         <td>layer, neuron</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>Layer Activation</td>
         <td>layer</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>Internal Influence</td>
         <td>layer</td>
-        <td><span style="color:red">3</span></td>
+        <td style="text-align: center"><span style="color:red">3</span></td>
     </tr>
     <tr>
         <td>GradCAM</td>
         <td>layer</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Neuron Gradient</td>
         <td>neuron</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
-        <th class="toolset-header" colspan=3>tf-keras-vis</th>
+        <th class="toolset-header" style="border-top: 2px solid; border-bottom: 2px solid; text-align: center;" colspan=3>tf-keras-vis</th>
     </tr>
     <tr>
         <td>Activation Maximization</td>
-        <td>feature visualization</td>
-        <td><span style="color:green">1</span></td>
+        <td>feature visualisation</td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>Vanilla Saliency / SmoothGrad</td>
         <td>attribution</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>GradCAM</td>
         <td>attribution</td>
-        <td><span style="color:green">1</span></td>
+        <td style="text-align: center"><span style="color:green">1</span></td>
     </tr>
     <tr>
         <td>GradCAM++</td>
         <td>attribution</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>ScoreCAM</td>
         <td>attribution</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
     <tr>
         <td>LayerCAM</td>
         <td>attribution</td>
-        <td><span style="color:yellow">2</span></td>
+        <td style="text-align: center"><span style="color:yellow">2</span></td>
     </tr>
 </table>
 
