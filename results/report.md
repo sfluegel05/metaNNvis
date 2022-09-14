@@ -24,14 +24,15 @@ certain goal such as activating a particular neuron (see [Figure 1b](#figure1b))
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px">
-<img id="figure1a" src="report_images/gradcam_example.png" alt="Grad-CAM for the classes 'cat' and 'dog'" height=74%/>
+<img id="figure1a" src="report_images/gradcam_example_horizontal.png" alt="Grad-CAM for the classes 'cat' and 'dog'" height=74%/>
 <div text-align=center class="caption">Figure 1a: Grad-CAM for the classes 'cat' and 'dog'. Source: <a href="#selvaraju2017">Selvaraju et al., 2017</a></div>
 </div>
 <div class="column" style="padding: 10px;">
-<img id="figure1b" src="report_images/feature_vis_example.png" alt="Feature Visualisation for a single neuron using existing images (top) and optimisation." height=74%/>
-<div text-align=center class="caption">Figure 1b: Feature Visualisation for a single neuron using existing images (top) and optimisation. Source: <a href="#olah2017">(Olah et al., 2017)</a></div>
+<img id="figure1b" src="report_images/feature_vis_example_horizontal.png" alt="Feature Visualisation for a single neuron using existing images (top) and optimisation." height=74%/>
+<div text-align=center class="caption">Figure 1b: Feature Visualisation for a single neuron using existing images (left) and optimisation. Source: <a href="#olah2017">Olah et al., 2017</a></div>
 </div>
 </div>
+<br>
 
 For users' convenience, implementations of many of these methods have been packaged and made publicly available in
 toolsets like [Captum](https://captum.ai/) or [tf-keras-vis](https://github.com/keisen/tf-keras-vis). These libraries
@@ -88,8 +89,16 @@ for image inputs and has been designed to be light-weight and flexible.
 
 Especially Captum implements a large number of methods: 36 in total, counting primary, layer and neuron variants
 seperately. In order to limit the scope of this project, we have chosen prioritise the introspection methods provided by
-Captum and tf-keras-vis. The result can be seen in the table below.
+Captum and tf-keras-vis.
 
+One criterion is to capture a wide range of different approaches, for instance including both gradient-based and
+perturbation-based methods. This also means that of similar method pairs like Feature Ablation and Occlusion, usually
+only one method is included. Basic, often-used methods are being preferred over more specialised ones as well. For this
+reson, GradCAM for example has a higher priority than the GradCAM variants. Additionally, methods which are known to
+fail sanity checks ([Adebayo et al., 2018](#adebayo2018); [Sixt et al., 2020](#sixt2020)) such as Guided Backpropagation
+have been excluded.The result can be seen in the table below.
+
+Todo: fix style block on github
 <style>
 .toolset-header {
   border-top: 2px solid black;
@@ -258,15 +267,8 @@ td:nth-child(3) {
 _Priority 1_ marks methods which are important and were implemented right away. These methods have also been used for
 the [evaluation](#evaluation). Methods marked as _priority 2_ are considered to be useful, but not essential to the
 project. Those methods are implemented as well, but are not part of the evaluation.
-_Priority 3_ is used for methods which are deemed not important to this project and thusly are not integrated into the
+_Priority 3_ is used for methods which are deemed not important to this project and thus are not integrated into the
 tool.
-
-The aim of this selection is to capture a wide range of different approaches, for instance including both gradient-based
-and perturbation-based methods. This also means that of similar method pairs like Feature Ablation and Occlusion,
-usually only one method is included. Basic, often-used methods are given an advantage compared to more specialised ones
-as well. For this reson, GradCAM for example has a higher priority than the GradCAM variants. Additionally, methods
-which are known to fail sanity checks ([Adebayo et al., 2018](#adebayo2018); [Sixt et al., 2020](#sixt2020)) such as
-Guided Backpropagation have been excluded.
 
 # MetaNNvis Implementation
 
@@ -276,13 +278,13 @@ To accomplish the task of making the selected methods from Captum accessible in 
 accessible in PyTorch, MetaNNvis has to have the following features:
 
 - **Model translation between PyTorch and TensorFlow**: The tool's most crucial component is the ability to transform a
-  PyTorch model into a TensorFlow model and vice versa. The translated model should behave equivalent or at least very
-  similar to the original model, i.e., yield the same results for the same inputs. This way, we can assume that any
-  introspection results we get for the translated model are also true for the original model.
+  PyTorch model into a TensorFlow model and vice versa. The translated model should behave equivalent to the original
+  model, i.e., yield the same results for the same inputs. This way, we can assume that any introspection results we get
+  for the translated model are also true for the original model.
 - **Data Translation**: Many introspection methods require not only a model, but also additional data, e.g., an input
   image for which to compute the saliency. Since users typically have model input data available in a format that
-  matches their model's framework, but the the framework of the translated model, input data needs to be transformed as
-  well.
+  matches their model's framework, but not the framework of the translated model, input data needs to be transformed as
+  well. Besides that, the tool should also be able to accept data in the target framework's or in an independent format.
 - **Interface for accessing introspection methods**: Finally, the tool has to pass the translated model and input data
   to the introspection method itself and return the results. This also includes passing additional parameters for
   finetuning the introspection method.
@@ -296,7 +298,7 @@ Beside these strictly neccessary features, there are a few additional requiremen
   methods from different toolsets simultaneously, this can become cumbersome. To improve the user experience, the tool
   should provide a single interface for all toolsets that hides most of the differences.
 - **Error handling**: Errors which may occur during any part of the process, for instance during model translation or
-  calling the introspection method itself, should be avoided or at least propagated where possible.
+  calling the introspection method itself, should be avoided or caught where possible.
 - **Plotting of results**: The results of introspection methods are typically multi-dimensional arrays which need to be
   visualised to be human-understandable. This is a task which can be provided by the tool as well.
 
@@ -310,6 +312,8 @@ To achieve these goals, we have decided on the structure shown in [Figure 2](#fi
 <div text-align=center class="caption">Figure 2: Internal and external components of MetaNNvis.</div>
 </div>
 </div>
+<br>
+
 
 First, let's take a look at the external components shown on the lefthand side. These are required as part of the
 translation process. Models are translated between PyTorch and TensorFlow via an intermediate representation,
@@ -346,7 +350,13 @@ methods, toolsets or even complete frameworks can be added as new subclasses wit
 Now, let's take a look at how these components work together when a user wants to execute an introspection method with a
 model from an incongruous framework, i.e., a user executes a method call like the following:
 
-    attribute(torch_model, method_key='grad_cam', toolset='tf-keras-vis', init_args={'layer': torch_model.conv2}, exec_args={'score': CategoricalScore(mnist_y.tolist()), 'seed_input': mnist_x, 'normalize_cam': False})
+    attribute(torch_model, method_key='grad_cam', toolset='tf-keras-vis', 
+              init_args={'layer': torch_model.conv2}, 
+              exec_args={'score': CategoricalScore(mnist_y.tolist()), 
+                         'seed_input': mnist_x, 
+                         'normalize_cam': False
+                        }
+    )
 
 Note that the user specifically requests a tf-keras-vis method, but gives the tool a PyTorch model. Thus, even if a
 Grad-CAM implementation is available in PyTorch, the tool has to select the TensorFlow implementation. How this or
@@ -366,12 +376,13 @@ exception is raised.
 Otherwise, if the model framework is not the one required by the introspection method, the model is translated
 accordingly. The input data for the introspection method (`init_args` and `exec_args`) is translated in the same way.
 
-Another special case is a missing `layer` argument. Unlike other missing arguments, this does not lead to an exception.
-This is because for Captum's Layer and Neuron methods, the layer of the (PyTorch) model has to be provided as an input
-and since the layer structure of TensorFlow models differs from their PyTorch translation, this might not be possible to
-provide when calling `attribute()` for the first time. Thus, the model gets translated and returned to the user
-alongside a list of available layers. The user can then choose a layer and call another
-method, `finish_execution_with_layer()` to resume the process.
+Another special case is a missing `layer` argument. This argument is used for Captum's Layer and Neuron methods, where
+layer of the (PyTorch) model has to be provided as an input to the attribution function. But since the layer structure
+of TensorFlow models differs from their PyTorch translation, it is not always possible to providing a correct layer
+identifier when calling `attribute()` for the first time. Thus, instead of raising an exception, as it would for other
+missing arguments, the tool translates the model and returns the translated model to the user alongside a list of
+available layers. The user can then pick a layer and call another method, `finish_execution_with_layer()` with an
+identifier for the chosen layer and the translated model to resume the process.
 
 Finally, the translated model and arguments are given to the introspection method and the result is returned.
 Optionally, a plot of the results is created as well.
@@ -382,25 +393,36 @@ Optionally, a plot of the results is created as well.
 <div text-align=center class="caption">Figure 3: The process for executing an introspection method with different parameters.</div>
 </div>
 </div>
+<br>
 
 Instructions on how to install and use MetaNNvis can be found in the [User Guide](/user_guide.ipynb). It also contains
 information on how to extend the tool with your own introspection methods.
 
+## Limitations
+
+todo
+
 # Evaluation
 
+We have evaluated our tool's functionality in three parts:
+First of all, we have verified that the model translation works correctly (see [Model Translation](#model-translation)).
+Furthermore, we evaluated whether the methods themselves yield expectable results for a simple clever hans predictor (
+see [Clever Hans](#clever-hans)) and compared the Saliency and Grad-CAM results of Captum and tf-keras-vis (
+see [Comparison](#comparison-between-toolsets)).
+
+## Model Translation
+
 We have conducted tests to verify that the model translation works as intended, i.e., that for different models and
-inputs, the outputs of models and their translations only differ by an amount which is several orders of magnitude lower
-than the output and thus negligible. This difference can be attributed to numerical errors during the translation
-process. From the strong similarity of the outputs, we can conclude that introspection results for one model are
-applicable to the other model as well.
+inputs, the outputs of models and their translations are identical. In our test we have found that the outputs only
+differ by an amount which is about 6 orders of magnitude lower than the output itself and thus is negligible. This
+difference can be attributed to numerical errors during the translation process.
 
-Furthermore, we evaluated whether the method yield expectable results for a simple clever hans predictor (see [Clever Hans](#clever-hans)) and compared the Saliency and Grad-CAM implementations of Captum and tf-keras-vis (see [Comparison](#comparison-between-toolsets)).
-
-Additional visualisations of our results can be found in the projects [results folder](../results/).
+From that, we conclude that the translation between frameworks keeps all important properties of NNs intact and that
+introspection results for one model are applicable to the other model as well.
 
 ## Clever Hans
 
-In order to evaluate if the results gained from executing an introspection method on a translated model actually yields
+In order to evaluate if the results gained from executing an introspection method on a translated model actually yield
 useful insights into the original model, we trained a CNN model on a modified MNIST
 dataset ([LeCun et. al., 1998](#lecun1998)) with permutated labels and 5x5 grey squares in the top left corner, their
 brightness correlating with the newly assigned label. This way, we can safely assume that the model only learns to use
@@ -413,16 +435,16 @@ model which had to be translated from a different framework.
 The results for the primary attribution methods are shown in [Figure 4](#fig:clever_hans). As can be seen, most methods
 indicate a strong focus of the network of the top left corner.
 [Figure 5](#fig:clever_hans_layer) shows the results of layer attribution methods for the first convolutional layer.
-Here, out of 20 channels, some are only react to the to top left corner (such as channels 16 and 18) while some show a
-random behaviour (like channel 19) or no activation at all.
+Here, out of 20 channels, some only react to the top left corner (such as channels 16 to 18) while some show a random
+behaviour (like channel 19) or no activation at all.
 
-TODO: update figures
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="fig:clever_hans" src="report_images/clever_hans_results_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image." width=100%/>
-<div text-align=center class="caption">Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN and this image.</div>
+<img id="fig:clever_hans" src="report_images/clever_hans_results_collage.png" alt="Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN." width=100%/>
+<div text-align=center class="caption">Figure 4: A modified MNIST image where the label depends on the square in the top left corner and the results of different attribution methods applied to a CNN.</div>
 </div>
 </div>
+<br>
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
@@ -430,10 +452,20 @@ TODO: update figures
 <div text-align=center class="caption">Figure 5: The outputs of different Captum Layer attribution methods for the first convolution layer of our CNN. The same input picture was used as in <a href="#fig:clever_hans">Figure 4</a>. Only 4 out of 20 channels are shown in this grafic.</div>
 </div>
 </div>
+<br>
 
-Overall, these results indicate that the translation of models between PyTorch and TensorFlow doesn't interfere with the
-introspection methods' abilities to correctly attribute activations. This goes both for primary methods using the whole
-model as well as for methods working for a certain layer (or neuron in that layer).
+
+The random or missing activations for some channels indicate that the model has learnt not to use its whole capacity for
+this classification task and that these channels have no influence on the results. This may be expected for a task that
+has been deliberately chosen to be as simple as possible.
+
+The remaining channels' focus on the top left corner shows that the networks pays much attention to this corner, which
+confirms our expectations since this is the only part of the images which is correlated to the label. This suggests that
+the applied introspection techniques have provided accurate results for this use case.
+
+Overall, these results indicate that the translation of models between PyTorch and TensorFlow does not interfere with
+the introspection methods' abilities to correctly attribute activations. This goes both for primary methods using the
+whole model as well as for methods working for a certain layer (or neuron in that layer).
 
 ## Comparison between Toolsets
 
@@ -450,21 +482,20 @@ gradient of the class score with respect to the input image.
 For our purposes, we trained both a TensorFlow and a PyTorch model on the MNIST dataset and applied the Saliency
 implementations of Captum and tf-keras-vis to them.
 [Figure 6](#fig:comparison_saliency) shows the results for one input image. For both models, the results from Captum and
-tf-keras-vis are nearly equal when additional parameters are used (see last row, columns 1 and 3). The additional
-parameters have been chosen deliberately in a way that results in similar results for both implementations. The
-remaining difference, which is several orders of magnitude lower than the method output, can be attributed to minor
-numerical differences resulting from the model translation process. If the default parameters are used, the difference
-between the Captum and tf-keras-vis results is significantly larger (see columns 2 and 4). This happens because
-tf-keras-vis has
+tf-keras-vis are nearly equal when custom parameters are used (see last row, columns 2 and 4). The custom parameters
+have been chosen deliberately in a way that results in similar results for both implementations. The remaining
+difference, which is several orders of magnitude lower than the method output, can be attributed to minor numerical
+differences resulting from the model translation process. If the default parameters are used, the difference between the
+Captum and tf-keras-vis results is significantly larger (see columns 1 and 3). This happens because tf-keras-vis has
 a `normalize_map` parameter that defaults to `true`, which scales the Saliency Map to values between 0 and 1.
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="fig:comparison_saliency" src="report_images/comparison_saliency_collage.png" alt="Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns show (from left to right): TF model and methods with additional parameters, TF model and methods with default parameters, Torch model and methods with additional parameters, Torch model and methods with default parameters." width=100%/>
-<div text-align=center class="caption">Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns show (from left to right): TF model and methods with additional parameters, TF model and methods with default parameters, Torch model and methods with additional parameters, Torch model and methods with default parameters.</div>
+<img id="fig:comparison_saliency" src="report_images/comparison_saliency_collage.png" alt="Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The left-hand columns show results for the TF model (with default and custom parameters), the right-hand columns show results for the PyTorch model." width=100%/>
+<div text-align=center class="caption">Figure 6: The results of the Captum and tf-keras-vis Saliency implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The left-hand columns show results for the TF model (with default and custom parameters), the right-hand columns show results for the PyTorch model.</div>
 </div>
 </div>
-
+<br>
 
 ### GradCAM
 
@@ -472,13 +503,13 @@ Gradient-weighted Class Activation Mapping (Grad-CAM) ([Selvaraju, 2017](#selvar
 CNNs which measures the importance of values in the feature space towards a certain target class.
 
 As we did for the Saliency methods, we compared the implementations of the Captum and tf-keras-vis GradCAM methods on
-both TensorFlow and PyTorch models. For each model, [Figure 7](#fig:comparison_gradcam) shows the results with
-additional parameters chosen in order to align the results from both implementations, with additional parameters and
-scaling to the input size and with default parameters. The results show, as they did for Saliency, that the difference
-between both implementations is negligible if the parameters are set accordingly, but not with default parameters. These
-differences mainly stem from tf-keras-vis' `normalize_map` option and from Captum's `relu_attributions` parameter that
-is `False` by default and has to be set to `True` for Captum to apply a ReLU to the result as it was done in the
-original paper describing GradCAM.
+both TensorFlow and PyTorch models. For each model, [Figure 7](#fig:comparison_gradcam) shows the results with default
+parameters, with custom parameters chosen in order to align the results from both implementations and with custom
+parameters and scaling to the input size. The results show, as they did for Saliency, that the difference between both
+implementations is negligible if the parameters are set accordingly, but not with default parameters. These differences
+mainly stem from tf-keras-vis' `normalize_map` option and from Captum's `relu_attributions` parameter that is `False` by
+default and has to be set to `True` for Captum to apply a ReLU to the result as it was done in the original paper
+describing GradCAM.
 
 The scaling of images to the original input size is a common feature for GradCAM implementations since it allows to
 superimpose a heatmap directly on input images. However, Captum and tf-keras-vis implement this differently:
@@ -488,10 +519,11 @@ interpolation.
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="fig:comparison_gradcam" src="report_images/comparison_gradcam_collage.png" alt="Figure 7: The results of the Captum and tf-keras-vis GradCAM implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns show (from left to right): TF model and methods with additional parameters, with additional parameters including scaling options and with default parameters, Torch model and methods with additional parameters, with additional parameters including and with default parameters (but also with scaling)." width=100%/>
-<div text-align=center class="caption">Figure 7: The results of the Captum and tf-keras-vis GradCAM implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns show (from left to right): TF model and methods with additional parameters, with additional parameters including scaling options and with default parameters (with scaling), Torch model and methods with additional parameters, with additional parameters including and with default parameters (with scaling).</div>
+<img id="fig:comparison_gradcam" src="report_images/comparison_gradcam_collage.png" alt="Figure 7: The results of the Captum and tf-keras-vis GradCAM implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns on the left show results for the TensorFlow model with default parameters and with customly chosen parameters both without and with scaling. The columns on the right show the same for the PyTorch model." width=100%/>
+<div text-align=center class="caption">Figure 7: The results of the Captum and tf-keras-vis GradCAM implementations for the input image shown at the top. The difference between both implementations is plotted in the bottom row. The columns on the left show results for the TensorFlow model with default parameters and with customly chosen parameters both without and with scaling. The columns on the right show the same for the PyTorch model.</div>
 </div>
 </div>
+<br>
 
 # Conclusion
 
@@ -501,8 +533,8 @@ provides a uniform interface for accessing these methods and can easily be exten
 
 We have shown that the results of introspection methods applied to a translated model yield meaningful insights for the
 original model by applying MetaNNvis to a basic Clever-Hans-predictor. Also, we have used our tool to compare the Captum
-and tf-keras-vis implementations of Saliency and Grad-CAM, showing that both implementations can provide the same
-results, but both toolsets have different default parameters.
+and tf-keras-vis implementations of Saliency and Grad-CAM, showing that, with default parameters, both yield different
+results. It is however possible to achieve matching results by chosing the correct parameters.
 
 # Bibliography
 
