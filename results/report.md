@@ -4,7 +4,9 @@ Blog Report Cross-Framework-Introspection
 # Introduction
 
 Over the last years, neural networks (NNs) have grown ever more powerful and complex. Their structure allows them to be
-adapted for a wide range of tasks in which the can provide great results.
+adapted for a wide range of tasks in which they can provide great results, such as image
+classification ([Krizhevsky et al., 2017](#krizhevsky2017)), machine
+translation ([Bahdanau et al., 2014](#bahdanau2014)) and speech recognition ([Dahl et al., 2011](#dahl2011)).
 
 One of their caveats however is the limited insight into how these results emerge. For most human users, the inside of a
 neural network is little more than a blackbox which turns input data into, e.g., a classification or prediction.
@@ -14,10 +16,12 @@ detailed understanding of the workings of each component in order to make the ri
 settings, such as decision making in medicine, who have to verify a model's results and rely on adequate explanations of
 the results to draw the right conclusions.
 
-Different algorithms, called introspection methods, have been developed to counteract this problem. They try to explain
-and visualise a networks's behaviour either by attributing the results to certain parts of either the input or of the
-network itself or alternatively by visualising features a network has learned. An example for attribution is the
-Grad-CAM method which allows to visualise the contribution of different parts in the input toward a classification (
+Different algorithms, called introspection methods, have been developed to counteract this
+problem ([Sundarajan et al., 2017](#sundararajan2017), [Shrikumar et al., 2017](#shrikumar2017)
+, [Fisher et al., 2020](#fisher2020)). They try to explain and visualise a networks's behaviour either by attributing
+the results to certain parts of either the input or of the network itself or alternatively by visualising features a
+network has learned. An example for attribution is the Grad-CAM method which allows to visualise the contribution of
+different parts in the input toward a classification (
 see [Figure 1a](#figure1a)). Feature visualisation on the other hand can be achieved by optimising an input towards a
 certain goal such as activating a particular neuron (see [Figure 1b](#figure1b)).
 
@@ -43,7 +47,7 @@ model framework, e.g. [PyTorch](https://pytorch.org/) or [TensorFlow](https://ww
 
 In practice, this may lead to situations like the following:
 Imagine you have trained a model in TensorFlow and now want to apply the attribution method Integrated
-Gradients [(Sudararajan, 2017)](#sundararajan2017) to it. You find out that this particular method is already
+Gradients ([Sudararajan, 2017](#sundararajan2017)) to it. You find out that this particular method is already
 implemented in Captum, a PyTorch toolset, but not in the TensorFlow toolset tf-keras-vis. This means that the only way
 to use your desired method is to transform your TensorFlow model into an equivalent PyTorch model.
 
@@ -384,12 +388,27 @@ Optionally, a plot of the results is created as well.
 </div>
 <br>
 
-Instructions on how to install and use MetaNNvis can be found in the [User Guide](/user_guide.ipynb). It also contains
+Instructions on how to install and use MetaNNvis can be found in
+the [User Guide](https://github.com/sfluegel05/metaNNvis/blob/main/results/user_guide.ipynb). It also contains
 information on how to extend the tool with your own introspection methods.
 
-## Limitations
+## Model Limitations
 
-todo
+Not all PyTorch and Tensorflow models are fully supported by MetaNNvis. This is due to the fact that the model
+translation process relies on several libraries which each don't support all of the operations theoretically available
+in PyTorch and Tensorflow models. Instead, they focus on a subset of operations which they deem the most relevant.
+
+Concretely, this means that the PyTorch-Tensorflow translation is dependent on torch.onnx and onnx2keras, with
+onnx2keras being the more restrictive part of the process. The limitations of torch.onnx are listed in
+its [documentation](https://pytorch.org/docs/stable/onnx.html#limitations) and the operations supported by onnx2keras
+can be inferred from the [source code](https://github.com/AxisCommunications/onnx-to-keras/blob/master/onnx2keras.py).
+It is however possible to add support for new operations to both libraries if needed as we did for the `log_softmax`
+operation in onnx2keras (see [this pull request](https://github.com/AxisCommunications/onnx-to-keras/pull/44))
+
+The Tensorflow-PyTorch translation depends on tensorflow-onnx and onnx2torch, which both provide lists of supported
+operators ([tensorflow-onnx](https://github.com/onnx/tensorflow-onnx/blob/main/support_status.md)
+, [onnx2torch](https://github.com/ENOT-AutoDL/onnx2torch/blob/main/operators.md)). If needed, support for additional
+operators can be added to these libraries as well.
 
 # Evaluation
 
@@ -528,11 +547,15 @@ results. It is however possible to achieve matching results by chosing the corre
 # Bibliography
 
 - <div id="adebayo2018">Julius Adebayo et al.: <a href="https://proceedings.neurips.cc/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html">Sanity Checks for Saliency Maps</a>, Advances in Neural Information Processing Systems, 2018</div>
-- <div id="kokhlikyan2020">Kokhlikyan et al.: <a href="https://arxiv.org/abs/2009.07896">Captum: A Unified and Generic Model Interpretability Library for PyTorch</a>, arXiv, 2020</div>
+- <div id="bahdanau2014">Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio: <a href="https://arxiv.org/abs/1409.0473">Neural Machine Translation by Jointly Learning to Align and Translate</a>, arXiv, 2014</div>
+- <div id="dahl2011">George E. Dahl, Dong Yu, Li Deng, Alex Acero:<a href="https://ieeexplore.ieee.org/abstract/document/5740583?casa_token=VdJIUBbT6nQAAAAA:-Q8pGqMkBVZliMH-WgApFs2cwFCapQS8IjVQxXGJuwg4A8e5mxscYw-3d5E8aEjvm_5hzv3Rs90">Context-Dependent Pre-Trained Deep Neural Networks for Large-Vocabulary Speech Recognition</a>, IEEE Transactions on Audio, Speech, and Language Processing, Volume 20, Issue 1, 2011</div>
+- <div id="fisher2020">Aaron Fisher, Cynthia Rudin, Francesca Dominici: <a href="https://www.jmlr.org/papers/volume20/18-760/18-760.pdf">All Models are Wrong, but Many are Useful: Learning a Variable’s Importance by Studying an Entire Class of Prediction Models Simultaneously</a>, Journal of Machine Learning Research 20, 2019</div>
+- <div id="kokhlikyan2020">Narine Kokhlikyan et al.: <a href="https://arxiv.org/abs/2009.07896">Captum: A Unified and Generic Model Interpretability Library for PyTorch</a>, arXiv, 2020</div>
+- <div id="krizhevsky2017">Alex Krizhevsky, Ilya Sutskever, Geoffrey E. Hinton: <a href="https://dl.acm.org/doi/abs/10.1145/3065386">ImageNet Classification with Deep Convolutional Neural Networks</a>, Communications of the ACM, Volume 60, Issue 6, 2017</div>
 - <div id="lecun1998">Yann LeCun et al.: <a href="https://ieeexplore.ieee.org/abstract/document/726791/?casa_token=Fi4h9S8m7YIAAAAA:PcPAnKGFtj9Y-iO0O9To9Ka0q3uQf0iaVS9SYGHU3DjQb1BEpXlh0Tv5AvNWE0yykgLk5wi54A">Gradient-based Learning Applied to Document Recognition</a>, IEEE, 1998</div>
 - <div id="olah2017">Chris Olah, Alexander Mordvintsev, Ludwig Schubert: <a href="https://distill.pub/2017/feature-visualization/">Feature Visualization</a>, Distill, 2017</div>
-- <div id="selvaraju2017">Ramprasaath R. Selvaraju et. al.: <a href="https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html">Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization</a>, Proceedings
-  of the IEEE International Conference on Computer Vision (ICCV), 2017</div>
+- <div id="selvaraju2017">Ramprasaath R. Selvaraju et. al.: <a href="https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html">Grad-CAM: Visual Explanations From Deep Networks via Gradient-Based Localization</a>, Proceedings of the IEEE International Conference on Computer Vision (ICCV), 2017</div>
+- <div id="shrikumar2017">Avanti Shrikumar, Peyton Greenside, Anshul Kundaje: <a href="http://proceedings.mlr.press/v70/shrikumar17a">Learning Important Feature Through Propagating Activation Differences</a>, Proceedings of the 34th International Conference on Machine Learning, 2017</div>
 - <div id="sixt2020">Leon Sixt, Maximilian Granz, Tim Landgraf: <a href="https://proceedings.mlr.press/v119/sixt20a.html">When Explanations Lie: Why Many Modified BP Attributions Fail</a>, Proceedings of the 37th International Conference on Machine Learning, 2020</div>
 - <div id="simonyan2013">Karen Simonyan, Andrea Vedaldi, Andrew Zisserma: <a href="https://arxiv.org/abs/1312.6034">Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps</a>, arXiv, 2013</div>
 - <div id="sundararajan2017">Mukund Sundararajan, Ankur Taly, Qiqi Yan: <a href="http://proceedings.mlr.press/v70/sundararajan17a.html">Axiomatic Attribution for Deep Networks</a>, Proceedings of the 34th International Conference on Machine Learning, 2017</div>

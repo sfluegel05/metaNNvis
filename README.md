@@ -12,6 +12,11 @@ The latest version of metaNNvis can be installed via pip:
 
 `pip install metaNNvis`
 
+Additionally, you need the following dependencies:
+`torch`, `seaborn`, `numpy`, `tensorflow`, `onnx2torch`, `onnx`, `captum`, `tf-keras-vis`, `torchvision`, `matplotlib`
+and `onnx2keras`. All dependencies can be installed via pip except for onnx2keras, which can be downloaded from the
+project's [GitHub page](https://github.com/AxisCommunications/onnx-to-keras)
+
 ## Usage
 
 For instructions on how to use cross-framework introspection and how to extend it by new methods, see
