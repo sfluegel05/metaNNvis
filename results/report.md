@@ -28,7 +28,7 @@ certain goal such as activating a particular neuron (see [Figure 1b](#figure1b))
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px">
-<img id="figure1a" src="report_images/gradcam_example_horizontal.png" alt="Grad-CAM for the classes 'cat' and 'dog'" width= 150%/>
+<img id="figure1a" src="report_images/gradcam_example_horizontal.png" alt="Grad-CAM for the classes 'cat' and 'dog'"/>
 <div text-align=center class="caption">Figure 1a: Grad-CAM for the classes 'cat' and 'dog'. Source: <a href="#selvaraju2017">Selvaraju et al., 2017</a></div>
 </div>
 <br>
