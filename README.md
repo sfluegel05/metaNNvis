@@ -1,6 +1,6 @@
-# Cross-Framework Introspection
+# MetaNNvis
 
-Cross-Framework Introspection is a tool for accessing introspection methods for neural networks regardless of the
+MetaNNvis is a tool for accessing introspection methods for neural networks regardless of the
 framework in which the neural network has been built. It is easily extendable and currently supports models from
 TensorFlow 2.0 and PyTorch in combination with methods from [Captum](captum.ai) and
 [tf-keras-vis](https://github.com/keisen/tf-keras-vis). For more details, see the
