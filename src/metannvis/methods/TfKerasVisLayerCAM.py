@@ -1,7 +1,7 @@
 from tf_keras_vis.layercam import Layercam
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_CAM
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_CAM
 
 
 class TfKerasVisLayerCAM(AbstractAttributionMethod):

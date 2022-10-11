@@ -1,7 +1,7 @@
 from tf_keras_vis.activation_maximization import ActivationMaximization
 
-from AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
-from method_keys import ACTIVATION_MAXIMIZATION
+from src.metannvis.methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
+from src.metannvis.methods.method_keys import ACTIVATION_MAXIMIZATION
 
 
 class TfKerasVisActivationMaximization(AbstractFeatureVisualizationMethod):

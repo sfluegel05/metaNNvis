@@ -1,7 +1,7 @@
 from captum.attr import LayerActivation
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_ACTIVATION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_ACTIVATION
 
 
 class CaptumLayerActivation(AbstractAttributionMethod):

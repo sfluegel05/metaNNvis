@@ -1,7 +1,7 @@
 from captum.attr import FeaturePermutation
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import FEATURE_PERMUTATION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import FEATURE_PERMUTATION
 
 
 class CaptumFeaturePermutation(AbstractAttributionMethod):

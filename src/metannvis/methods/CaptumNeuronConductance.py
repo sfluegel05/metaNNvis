@@ -1,7 +1,7 @@
 from captum.attr import NeuronConductance
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import NEURON_CONDUCTANCE
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import NEURON_CONDUCTANCE
 
 
 class CaptumNeuronConductance(AbstractAttributionMethod):

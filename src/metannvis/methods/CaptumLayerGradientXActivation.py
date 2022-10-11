@@ -1,7 +1,7 @@
 from captum.attr import LayerGradientXActivation
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_GRADIENT_X_ACTIVATION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_GRADIENT_X_ACTIVATION
 
 
 class CaptumLayerGradientXActivation(AbstractAttributionMethod):

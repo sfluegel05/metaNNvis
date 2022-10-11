@@ -1,7 +1,7 @@
 from captum.attr import NeuronDeepLift
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import NEURON_DEEP_LIFT
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import NEURON_DEEP_LIFT
 
 
 class CaptumNeuronDeepLift(AbstractAttributionMethod):

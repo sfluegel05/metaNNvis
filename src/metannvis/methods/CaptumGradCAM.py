@@ -1,7 +1,7 @@
 from captum.attr import LayerGradCam
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import GRAD_CAM
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import GRAD_CAM
 
 
 class CaptumGradCAM(AbstractAttributionMethod):

@@ -1,7 +1,7 @@
 from tf_keras_vis.gradcam import GradcamPlusPlus
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import GRAD_CAM_PLUS_PLUS
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import GRAD_CAM_PLUS_PLUS
 
 
 class TfKerasVisGradcamPlusPlus(AbstractAttributionMethod):

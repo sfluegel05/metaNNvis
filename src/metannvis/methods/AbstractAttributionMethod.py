@@ -1,6 +1,6 @@
 from abc import ABC
 
-from AbstractMethod import AbstractMethod
+from src.metannvis.methods.AbstractMethod import AbstractMethod
 
 
 class AbstractAttributionMethod(AbstractMethod, ABC):

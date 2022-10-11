@@ -2,16 +2,16 @@ import logging
 
 import seaborn
 
-from methods.AbstractAttributionMethod import AbstractAttributionMethod
-from methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
-from toolsets.Captum import Captum
-from toolsets.TfKerasVis import TfKerasVis
-from translations.Torch2TfTranslation import Torch2TfTranslation
-from translations.Tf2TorchTranslation import Tf2TorchTranslation
-from frameworks.PyTorchFramework import PyTorchFramework
-from frameworks.TensorFlow2Framework import TensorFlow2Framework
-from translations.Translation import Translation
-from frameworks.Framework import Framework
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.AbstractFeatureVisualizationMethod import AbstractFeatureVisualizationMethod
+from src.metannvis.toolsets.Captum import Captum
+from src.metannvis.toolsets.TfKerasVis import TfKerasVis
+from src.metannvis.translations.Torch2TfTranslation import Torch2TfTranslation
+from src.metannvis.translations.Tf2TorchTranslation import Tf2TorchTranslation
+from src.metannvis.frameworks.PyTorchFramework import PyTorchFramework
+from src.metannvis.frameworks.TensorFlow2Framework import TensorFlow2Framework
+from src.metannvis.translations.Translation import Translation
+from src.metannvis.frameworks.Framework import Framework
 
 TRANSLATIONS = [Torch2TfTranslation, Tf2TorchTranslation]
 FRAMEWORKS = [PyTorchFramework, TensorFlow2Framework]

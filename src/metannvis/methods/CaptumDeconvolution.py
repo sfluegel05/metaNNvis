@@ -1,7 +1,7 @@
 from captum.attr import Deconvolution
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import DECONVOLUTION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import DECONVOLUTION
 
 
 class CaptumDeconvolution(AbstractAttributionMethod):

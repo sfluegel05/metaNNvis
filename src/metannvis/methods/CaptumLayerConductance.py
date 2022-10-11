@@ -1,7 +1,7 @@
 from captum.attr import LayerConductance
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_CONDUCTANCE
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_CONDUCTANCE
 
 
 class CaptumLayerConductance(AbstractAttributionMethod):

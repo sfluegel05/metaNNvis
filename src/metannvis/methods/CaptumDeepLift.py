@@ -1,7 +1,7 @@
 from captum.attr import DeepLift
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import DEEP_LIFT
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import DEEP_LIFT
 
 
 class CaptumDeepLift(AbstractAttributionMethod):

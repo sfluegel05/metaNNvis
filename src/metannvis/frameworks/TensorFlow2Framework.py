@@ -1,7 +1,7 @@
-from Framework import Framework
 import tensorflow as tf
 
-from framework_keys import TENSORFLOW2
+from src.metannvis.frameworks.framework_keys import TENSORFLOW2
+from src.metannvis.frameworks.Framework import Framework
 
 
 class TensorFlow2Framework(Framework):

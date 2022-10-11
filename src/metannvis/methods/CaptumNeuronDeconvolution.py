@@ -1,7 +1,7 @@
 from captum.attr import NeuronDeconvolution
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import NEURON_DECONVOLUTION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import NEURON_DECONVOLUTION
 
 
 class CaptumNeuronDeconvolution(AbstractAttributionMethod):

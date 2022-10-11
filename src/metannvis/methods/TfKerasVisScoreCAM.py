@@ -1,5 +1,7 @@
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import SCORE_CAM
+from tf_keras_vis.scorecam import Scorecam
+
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import SCORE_CAM
 
 
 class TfKerasVisScoreCAM(AbstractAttributionMethod):
@@ -14,7 +16,7 @@ class TfKerasVisScoreCAM(AbstractAttributionMethod):
         if init_args is None:
             init_args = {}
 
-        scorecam = SCORE_CAM(model, **init_args)
+        scorecam = Scorecam(model, **init_args)
         attr = scorecam(**exec_args)
 
         return attr

@@ -1,7 +1,7 @@
 from captum.attr import LayerIntegratedGradients
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_INTEGRATED_GRADIENTS
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_INTEGRATED_GRADIENTS
 
 
 class CaptumLayerIntegratedGradients(AbstractAttributionMethod):

@@ -1,7 +1,7 @@
 from captum.attr import NeuronGradientShap
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import NEURON_GRADIENT_SHAP
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import NEURON_GRADIENT_SHAP
 
 
 class CaptumNeuronGradientSHAP(AbstractAttributionMethod):

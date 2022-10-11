@@ -1,7 +1,7 @@
 from captum.attr import LayerFeatureAblation
 
-from AbstractAttributionMethod import AbstractAttributionMethod
-from method_keys import LAYER_FEATURE_ABLATION
+from src.metannvis.methods.AbstractAttributionMethod import AbstractAttributionMethod
+from src.metannvis.methods.method_keys import LAYER_FEATURE_ABLATION
 
 
 class CaptumLayerFeatureAblation(AbstractAttributionMethod):

@@ -1,7 +1,7 @@
 from torch.nn import Module
 
-from framework_keys import PYTORCH
-from Framework import Framework
+from src.metannvis.frameworks.framework_keys import PYTORCH
+from src.metannvis.frameworks.Framework import Framework
 
 
 class PyTorchFramework(Framework):
