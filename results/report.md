@@ -343,7 +343,7 @@ methods, toolsets or even complete frameworks can be added as new subclasses wit
 Now, let's take a look at how these components work together when a user wants to execute an introspection method with a
 model from an incongruous framework, i.e., a user executes a method call like the following:
 
-    attribute(torch_model, method_key='grad_cam', toolset='tf-keras-vis', 
+    perform_attribution(torch_model, method_key='grad_cam', toolset='tf-keras-vis', 
               init_args={'layer': torch_model.conv2}, 
               exec_args={'score': CategoricalScore(mnist_y.tolist()), 
                          'seed_input': mnist_x, 
@@ -372,7 +372,7 @@ accordingly. The input data for the introspection method (`init_args` and `exec_
 Another special case is a missing `layer` argument. This argument is used for Captum's Layer and Neuron methods, where
 layer of the (PyTorch) model has to be provided as an input to the attribution function. But since the layer structure
 of TensorFlow models differs from their PyTorch translation, it is not always possible to providing a correct layer
-identifier when calling `attribute()` for the first time. Thus, instead of raising an exception, as it would for other
+identifier when calling `perform_attribution()` for the first time. Thus, instead of raising an exception, as it would for other
 missing arguments, the tool translates the model and returns the translated model to the user alongside a list of
 available layers. The user can then pick a layer and call another method, `finish_execution_with_layer()` with an
 identifier for the chosen layer and the translated model to resume the process.
@@ -382,7 +382,7 @@ Optionally, a plot of the results is created as well.
 
 <div class="row" style="display: flex">
 <div class="column" style="padding: 10px;">
-<img id="fig:activity_diagram" src="report_images/cfi_activity_19-08-22.png" alt="Figure 3: The process for executing an introspection method with different parameters." width=100%/>
+<img id="fig:activity_diagram" src="report_images/cfi_activity_11-10-22.png" alt="Figure 3: The process for executing an introspection method with different parameters." width=100%/>
 <div text-align=center class="caption">Figure 3: The process for executing an introspection method with different parameters.</div>
 </div>
 </div>
